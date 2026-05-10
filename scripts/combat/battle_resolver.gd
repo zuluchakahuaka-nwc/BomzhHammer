@@ -35,7 +35,7 @@ var _terrain_attack: Dictionary = {
 
 signal battle_result(result: Dictionary)
 
-func _calc_naglost(unit: CardInstance, round_num: int) -> int:
+func _calc_naglost(unit: RefCounted, round_num: int) -> int:
 	if unit.naglost <= 0:
 		return 0
 	if round_num % 2 != 0:
@@ -44,7 +44,7 @@ func _calc_naglost(unit: CardInstance, round_num: int) -> int:
 		return unit.naglost
 	return 0
 
-func resolve(attacker: CardInstance, defender: CardInstance, territory_data: Dictionary) -> Dictionary:
+func resolve(attacker: RefCounted, defender: RefCounted, territory_data: Dictionary) -> Dictionary:
 	var terrain: String = territory_data.get("terrain", "open_street")
 	var result: Dictionary = {
 		"attacker_id": attacker.id,
@@ -97,15 +97,20 @@ func resolve_multi(attackers: Array, defenders: Array, territory_data: Dictionar
 	}
 	var atk_idx: int = 0
 	var def_idx: int = 0
-	while atk_idx < attackers.size() and def_idx < defenders.size():
-		var a: CardInstance = attackers[atk_idx]
-		var d: CardInstance = defenders[def_idx]
+	var total_duels: int = 0
+	var max_duels: int = attackers.size() * defenders.size() + 10
+	while atk_idx < attackers.size() and def_idx < defenders.size() and total_duels < max_duels:
+		total_duels += 1
+		var a: RefCounted = attackers[atk_idx]
+		var d: RefCounted = defenders[def_idx]
 		var duel: Dictionary = resolve(a, d, territory_data)
 		result["rounds"].append(duel)
 		if not a.is_alive():
 			atk_idx += 1
 		if not d.is_alive():
 			def_idx += 1
+		if a.is_alive() and d.is_alive():
+			atk_idx += 1
 	if def_idx >= defenders.size() and atk_idx < attackers.size():
 		result["player_won"] = true
 	var surviving_attackers: Array = []

@@ -1,8 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://6b1pl71cpybd"]
+[gd_scene load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://scenes/main_menu.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://8dx3emycdjb7" path="res://assets/sprites/splash/logos/logo_5.jpg" id="2"]
-[ext_resource type="Texture2D" uid="uid://b7hs5vrpcbuix" path="res://assets/sprites/splash/bomzh_tv_bg.jpg" id="3"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -29,7 +27,7 @@ anchor_right = 1.0
 anchor_bottom = 0.95
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2")
+texture = null
 expand_mode = 1
 stretch_mode = 6
 
@@ -47,9 +45,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3")
-expand_mode = 1
-stretch_mode = 6
+	texture = null
+	expand_mode = 1
+	stretch_mode = 6
 
 [node name="TVLabel" type="Label" parent="BomzhTV"]
 z_index = 20

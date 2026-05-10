@@ -31,6 +31,8 @@ btn.new_game,НОВАЯ ИГРА,NEW GAME
 btn.continue,ПРОДОЛЖИТЬ,CONTINUE
 btn.settings,НАСТРОЙКИ,SETTINGS
 btn.quit,ВЫХОД,QUIT
+btn.bot_arena,БОТ АРЕНА,BOT ARENA
+btn.card_review,КАРТЫ,CARDS
 btn.end_phase,КОНЕЦ ФАЗЫ,END PHASE
 btn.back,НАЗАД,BACK
 btn.fight,ДРАТЬСЯ!,FIGHT!

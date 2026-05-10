@@ -12,6 +12,10 @@ func build_map() -> void:
 	_map._city_map_tex = load_city_texture()
 	if _map._city_map_tex:
 		Logger.info("GameMap", "CityMap texture loaded OK, size=%s" % str(_map._city_map_tex.get_size()))
+		var city_bg: TextureRect = _map.map_area.get_node_or_null("CityBg")
+		if city_bg:
+			city_bg.texture = _map._city_map_tex
+			Logger.info("GameMap", "CityBg TextureRect updated")
 	else:
 		Logger.error("GameMap", "FAILED to load city_map.jpg!")
 
@@ -26,11 +30,9 @@ func load_city_texture() -> Texture2D:
 		"res://assets/sprites/map/city_map_backup.jpg",
 	]
 	for p in paths:
-		if not ResourceLoader.exists(p):
-			continue
-		var tex: Texture2D = load(p)
+		var tex := SafeLoader.texture(p)
 		if tex != null:
-			Logger.info("GameMap", "Loaded city_map from: %s" % p)
+			Logger.info("GameMap", "Loaded city_map: %s" % p)
 			return tex
 	return null
 

@@ -25,8 +25,9 @@ func show_territory_overlay(t_id: String) -> void:
 	details += " | Бутылки:%d Мелочишка:%d Водка:%d" % [data.get("resource_bottles",0),data.get("resource_coins",0),data.get("resource_rolltons",0)]
 	terr_overlay_details.text = details
 	var img_path: String = "res://assets/sprites/map/territories/%s.jpg" % t_id
-	if ResourceLoader.exists(img_path):
-		terr_overlay_img.texture = load(img_path)
+	var tex := SafeLoader.texture(img_path)
+	if tex:
+		terr_overlay_img.texture = tex
 		terr_overlay_img.visible = true
 	else:
 		terr_overlay_img.visible = false
@@ -119,10 +120,9 @@ func _load_unit_portrait(unit: RefCounted) -> TextureRect:
 		"res://assets/sprites/cards/spells/%s.jpg" % portrait_id
 	]
 	for p in paths:
-		if ResourceLoader.exists(p):
-			var tex: Resource = load(p)
-			if tex is Texture2D:
-				var rect := TextureRect.new()
-				rect.texture = tex as Texture2D
-				return rect
+		var tex := SafeLoader.texture(p)
+		if tex:
+			var rect := TextureRect.new()
+			rect.texture = tex
+			return rect
 	return null

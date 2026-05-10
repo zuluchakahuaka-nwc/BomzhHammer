@@ -80,9 +80,10 @@ func _make_tm() -> RefCounted:
 	var TMS: GDScript = load("res://scripts/core/turn_manager.gd")
 	return TMS.new()
 
-func _make_unit(unit_id: String) -> CardInstance:
+func _make_unit(unit_id: String) -> RefCounted:
+	var CIScript = load("res://scripts/cards/card_instance.gd")
 	var data: Dictionary = _cd.get_unit(unit_id)
-	return CardInstance.new(data)
+	return CIScript.new(data)
 
 func _make_territory_data(tid: String) -> Dictionary:
 	return _cd.get_territory(tid)
@@ -163,8 +164,8 @@ func _test_combat_forced() -> void:
 	var tm: RefCounted = _make_tm()
 	tm.new_game()
 
-	var attacker: CardInstance = _make_unit("unit_recruit")
-	var defender: CardInstance = _make_unit("unit_novice")
+	var attacker = _make_unit("unit_recruit")
+	var defender = _make_unit("unit_novice")
 	attacker.territory_id = "street_center"
 	defender.territory_id = "street_center"
 

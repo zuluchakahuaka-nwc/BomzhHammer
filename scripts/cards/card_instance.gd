@@ -42,6 +42,16 @@ func _init(data: Dictionary = {}) -> void:
 func get_name() -> String:
 	return Localization.get_card_name(card_data)
 
+func to_dict() -> Dictionary:
+	var d: Dictionary = card_data.duplicate()
+	d["current_hp"] = current_hp
+	d["max_hp"] = max_hp
+	d["effective_attack"] = get_effective_attack()
+	d["effective_defense"] = get_effective_defense()
+	d["is_deployed"] = territory_id != ""
+	d["is_exhausted"] = is_exhausted
+	return d
+
 func get_description() -> String:
 	return Localization.get_card_description(card_data)
 

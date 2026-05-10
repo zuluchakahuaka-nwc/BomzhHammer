@@ -35,6 +35,8 @@ ResearchSystem="*res://scripts/core/research_system.gd"
 SaveManager="*res://scripts/core/save_manager.gd"
 MusicPlayer="*res://scripts/core/music_player.gd"
 GameBot="res://scripts/ui/bot_visual.gd"
+SafeLoader="*res://scripts/core/safe_loader.gd"
+LensScanner="*res://scripts/core/lens_scanner.gd"
 
 [display]
 

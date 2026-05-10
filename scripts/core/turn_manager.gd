@@ -424,7 +424,10 @@ func _move_units_for_side(side: String, deployed: Dictionary) -> int:
 		if units.size() <= 1:
 			continue
 		var adjacent: Array = CardDatabase.get_adjacent_territories(t_id)
+		var moved_this := false
 		for adj_id in adjacent:
+			if moved_this:
+				break
 			var owner: String = GameManager.get_territory_owner(adj_id)
 			if owner != side:
 				var unit: CardInstance = units.pop_front()
@@ -433,7 +436,8 @@ func _move_units_for_side(side: String, deployed: Dictionary) -> int:
 				deployed[adj_id].append(unit)
 				unit.territory_id = adj_id
 				count += 1
-				break
+				moved_this = true
+				Logger.info("TurnManager", "MOVE: %s unit from %s -> %s (owner=%s)" % [side, t_id, adj_id, owner])
 	return count
 
 func _capture_uncontested(deployed: Dictionary, side: String) -> void:
@@ -444,6 +448,9 @@ func _capture_uncontested(deployed: Dictionary, side: String) -> void:
 				has_alive = true
 				break
 		if has_alive:
+			var old_owner: String = GameManager.get_territory_owner(t_id)
+			if old_owner != side:
+				Logger.info("TurnManager", "CAPTURE: %s takes %s (was %s)" % [side, t_id, old_owner])
 			GameManager.set_territory_owner(t_id, side)
 
 func _find_deploy_target(side: String, deployed: Dictionary) -> String:

@@ -19,6 +19,12 @@ extends Control
 @onready var effects_grid: GridContainer = $EffectsPanel/EffectsGrid
 @onready var effects_toggle: Button = $EffectsPanel/ToggleBtn
 var _active_effects: Array = []
+var _unit_scroll_offset: float = 0.0
+var _sit_scroll_offset: float = 0.0
+var _unit_total_w: float = 0.0
+var _sit_total_w: float = 0.0
+var _card_w: float = 180.0
+var _card_gap: float = 8.0
 @onready var territory_panel: PanelContainer = $TerritoryInfoPanel
 @onready var t_name: Label = $TerritoryInfoPanel/TVBox/TName
 @onready var t_owner: Label = $TerritoryInfoPanel/TVBox/TOwner
@@ -81,6 +87,12 @@ var _placing: bool = false
 var _placing_data: Dictionary = {}
 var _ghost: Control = null
 var _territory_markers: Dictionary = {}
+var _bot_active: bool = false
+var _bot_timer: float = 0.0
+var _bot_phase_done: bool = false
+var _bot_deployed_this_phase: bool = false
+var _bot_max_turns: int = 6
+
 var _effects_collapsed: bool = false
 var _npc_garrisons: Dictionary = {}
 var _all_unit_data: Array = []
@@ -104,6 +116,7 @@ var _battle_overlay: RefCounted = null
 var _result_popup: RefCounted = null
 
 func _ready() -> void:
+	_bot_active = "--bot" in OS.get_cmdline_args()
 	_card_effect = CardEffectScript.new()
 	_battle_handler = BattleHandlerScript.new(self)
 	_map_builder = MapBuilderScript.new(self)
@@ -253,40 +266,64 @@ func _clear_effects_panel() -> void:
 	_active_effects.clear()
 	if not effects_grid:
 		return
-	for child in effects_grid.get_children():
-		child.queue_free()
+	_clear_children(effects_grid)
+
+func _clear_children(node: Node) -> void:
+	for child in node.get_children():
+		if not child.is_in_group("scroll_arrow"):
+			node.remove_child(child)
+			child.free()
 
 func _refresh_hand_display() -> void:
-	for child in unit_side.get_children():
-		child.queue_free()
-	for child in sit_side.get_children():
-		child.queue_free()
-	var all_cards: Array = _hand.get_all()
-	var unit_cards: Array = []
+	_clear_children(unit_side)
+	_clear_children(sit_side)
+	var deployed_cards: Array = []
+	if _selected_territory != "" and _player_deployed.has(_selected_territory):
+		var alive: Array = []
+		for u in _player_deployed[_selected_territory]:
+			if u.is_alive():
+				deployed_cards.append(u.to_dict())
+				alive.append(u)
+		_player_deployed[_selected_territory] = alive
+	var hand_unit_cards: Array = []
 	var sit_cards: Array = []
+	var all_cards: Array = _hand.get_all()
 	for card_data in all_cards:
 		if card_data.get("type", "") in ["unit", "commander"]:
-			unit_cards.append(card_data)
+			hand_unit_cards.append(card_data)
 		else:
 			sit_cards.append(card_data)
-	_place_hand_cards(unit_side, unit_cards)
+	var all_unit_cards: Array = deployed_cards + hand_unit_cards
+	_place_hand_cards(unit_side, all_unit_cards)
 	_place_hand_cards(sit_side, sit_cards)
+	if deployed_cards.size() > 0:
+		_lm("Territory %s: %d deployed + %d in hand" % [_selected_territory, deployed_cards.size(), hand_unit_cards.size()])
 
 func _place_hand_cards(container: Control, cards: Array) -> void:
 	if cards.is_empty():
 		return
-	var card_w: float = 180.0
+	var card_w: float = _card_w
 	var card_h: float = 270.0
 	var container_w: float = container.size.x
 	if container_w < 10:
 		container_w = container.custom_minimum_size.x
 		if container_w < 10:
 			container_w = 400.0
-	var overlap: float = 0.0
-	if cards.size() > 1:
-		var total_w: float = card_w + (cards.size() - 1) * (card_w * 0.55)
-		if total_w > container_w:
-			overlap = (total_w - container_w) / float(cards.size() - 1)
+	var spacing: float = _card_w + _card_gap
+	var total_w: float = card_w + maxf(cards.size() - 1, 0.0) * spacing
+	var is_unit: bool = (container == unit_side)
+	if is_unit:
+		_unit_total_w = total_w
+	else:
+		_sit_total_w = total_w
+	var max_offset: float = maxf(total_w - container_w, 0.0)
+	var scroll_off: float = 0.0
+	if is_unit:
+		_unit_scroll_offset = minf(_unit_scroll_offset, max_offset)
+		scroll_off = _unit_scroll_offset
+	else:
+		_sit_scroll_offset = minf(_sit_scroll_offset, max_offset)
+		scroll_off = _sit_scroll_offset
 	for i in range(cards.size()):
 		var card_data: Dictionary = cards[i]
 		var widget := Control.new()
@@ -294,12 +331,44 @@ func _place_hand_cards(container: Control, cards: Array) -> void:
 		widget.name = "Card_" + str(i)
 		widget.custom_minimum_size = Vector2(card_w, card_h)
 		widget.size = Vector2(card_w, card_h)
-		widget.position = Vector2(i * maxf(card_w * 0.55 - overlap, 10.0), 0.0)
+		widget.position = Vector2(i * spacing - scroll_off, 30.0)
 		widget.z_index = i
 		container.add_child(widget)
 		widget.setup(card_data)
 		widget.card_clicked.connect(_on_card_left_click)
 		widget.card_right_clicked.connect(_on_card_right_click)
+	if total_w > container_w:
+		_add_scroll_arrows(container, is_unit, container_w)
+
+func _add_scroll_arrows(container: Control, is_unit: bool, container_w: float) -> void:
+	var arrow_size: float = 28.0
+	var left_btn := Button.new()
+	left_btn.text = "<"
+	left_btn.name = "ScrollLeft"
+	left_btn.add_to_group("scroll_arrow")
+	left_btn.set_anchors_preset(Control.PRESET_CENTER_LEFT)
+	left_btn.position = Vector2(2, 30)
+	left_btn.size = Vector2(arrow_size, arrow_size)
+	left_btn.z_index = 100
+	left_btn.pressed.connect(_on_scroll_cards.bind(is_unit, -(_card_w + _card_gap)))
+	container.add_child(left_btn)
+	var right_btn := Button.new()
+	right_btn.text = ">"
+	right_btn.name = "ScrollRight"
+	right_btn.add_to_group("scroll_arrow")
+	right_btn.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
+	right_btn.position = Vector2(container_w - arrow_size - 2, 30)
+	right_btn.size = Vector2(arrow_size, arrow_size)
+	right_btn.z_index = 100
+	right_btn.pressed.connect(_on_scroll_cards.bind(is_unit, _card_w + _card_gap))
+	container.add_child(right_btn)
+
+func _on_scroll_cards(is_unit: bool, delta: float) -> void:
+	if is_unit:
+		_unit_scroll_offset = clampf(_unit_scroll_offset + delta, 0.0, maxf(_unit_total_w - unit_side.size.x, 0.0))
+	else:
+		_sit_scroll_offset = clampf(_sit_scroll_offset + delta, 0.0, maxf(_sit_total_w - sit_side.size.x, 0.0))
+	_refresh_hand_display()
 
 func _draw_from_deck(deck: RefCounted) -> void:
 	if deck == null or deck.is_empty():
@@ -321,9 +390,17 @@ func _process(_delta: float) -> void:
 	if _placing and _ghost != null:
 		_ghost.global_position = get_global_mouse_position() - _ghost.size * 0.25
 	queue_redraw()
+	if _bot_active:
+		_bot_timer -= _delta
+		if _bot_timer <= 0:
+			_bot_tick()
 
 func _draw() -> void:
 	if _city_map_tex == null:
+		_city_map_tex = _reload_city_map()
+	if _city_map_tex == null:
+		if Engine.get_frames_drawn() % 300 == 0:
+			Logger.error("GameMap", "_draw: city_map_tex is NULL, cannot draw map")
 		return
 	var tex_size: Vector2 = _city_map_tex.get_size()
 	var area_pos: Vector2 = map_area.position
@@ -336,6 +413,23 @@ func _draw() -> void:
 	var draw_size: Vector2 = tex_size * s
 	var offset: Vector2 = area_pos + (area_size - draw_size) * 0.5
 	draw_texture_rect(_city_map_tex, Rect2(offset, draw_size), false)
+
+func _reload_city_map() -> Texture2D:
+	var paths: Array = [
+		"res://assets/sprites/map/city_map.jpg",
+		"res://assets/sprites/map/city_map_backup.jpg",
+	]
+	for p in paths:
+		var img := Image.new()
+		if img.load(p) == OK:
+			var tex := ImageTexture.create_from_image(img)
+			if tex != null:
+				Logger.info("GameMap", "City map reloaded from %s" % p)
+				var city_bg: TextureRect = map_area.get_node_or_null("CityBg")
+				if city_bg:
+					city_bg.texture = tex
+				return tex
+	return null
 
 func _on_card_left_click(data: Dictionary) -> void:
 	if data.get("type", "") in ["unit", "commander"]:
@@ -414,12 +508,12 @@ func _deploy_to_territory(target: String) -> void:
 	var data: Dictionary = _placing_data
 	_cancel_placing()
 	var is_from_hand: bool = _hand.has_card(data.get("id", ""))
+	var cost: Dictionary = data.get("cost", {})
 	if is_from_hand:
-		var cost: Dictionary = data.get("cost", {})
 		if not GameManager.can_afford(cost):
-		_lm("Cannot afford: %s" % Localization.get_card_name(data))
-		return
-	GameManager.spend(cost)
+			_lm("Cannot afford: %s" % Localization.get_card_name(data))
+			return
+		GameManager.spend(cost)
 	var source_tid: String = ""
 	var source_instance: RefCounted = null
 	if not is_from_hand and _selected_territory != "":
@@ -697,8 +791,9 @@ func _show_territory_info(t_id: String) -> void:
 		t_units.text = Localization.t("territory.resources") % [data.get("resource_bottles",0), data.get("resource_coins",0), data.get("resource_rolltons",0)] + garrison_text
 		t_buyout.visible = false
 	var img_path: String = "res://assets/sprites/map/territories/%s.jpg" % t_id
-	if ResourceLoader.exists(img_path):
-		t_image.texture = load(img_path)
+	var tex := SafeLoader.texture(img_path)
+	if tex:
+		t_image.texture = tex
 		t_image.visible = true
 	else:
 		t_image.visible = false
@@ -757,11 +852,11 @@ func _on_resource_changed(_resource: String, _new_value: int) -> void:
 	_update_resources()
 
 func _on_end_phase() -> void:
+	if _result_popup != null and _result_popup.is_showing():
+		_result_popup.dismiss()
 	var phase: int = GameManager.get_current_phase()
 	match phase:
 		0:
-			_clear_effects_panel()
-			ResourceManager.apply_income()
 			_spawn_territory_units()
 			_update_resources()
 			Logger.info("GameMap", "Phase 0: Income applied, territory units spawned")
@@ -769,7 +864,7 @@ func _on_end_phase() -> void:
 			_auto_draw_turn()
 			Logger.info("GameMap", "Phase 1: Cards drawn (%d in hand)" % _hand.size())
 		2:
-			Logger.info("GameMap", "Phase 2: Movement — click cards to play, then End Phase")
+			Logger.info("GameMap", "Phase 2: Movement done, advancing to combat")
 		3:
 			_combat_phase_active = true
 			_combat_ui.execute_player_combat()
@@ -780,7 +875,7 @@ func _on_end_phase() -> void:
 			_combat_ui.end_player_turn_units()
 			_check_religion_ideology()
 			return
-	GameManager.advance_phase()
+	GameManager.advance_phase.call_deferred()
 
 func _check_religion_ideology() -> void:
 	if not GameManager.is_religion_chosen() and GameManager.get_player_territory_count() >= 3:
@@ -789,34 +884,22 @@ func _check_religion_ideology() -> void:
 	if not GameManager.is_ideology_chosen() and GameManager.get_player_territory_count() >= 5:
 		_show_ideology_choice()
 		return
-	GameManager.advance_phase()
+	GameManager.advance_phase.call_deferred()
 
 func _spawn_territory_units() -> void:
-	var all_unit_data: Array = CardDatabase._units.values()
-	if all_unit_data.is_empty():
-		return
 	var spawned: int = 0
-	for t_id in _player_deployed.keys():
-		var count: int = 2 if t_id == "dump_west" else 1
-		for _j in range(count):
-			var template: Dictionary = all_unit_data[randi() % all_unit_data.size()]
-			var instance: RefCounted = CardInstanceScript.new(template)
-			instance.territory_id = t_id
-			_player_deployed[t_id].append(instance)
-			spawned += 1
-		_territory_mgr.update_territory_marker(t_id)
 	if not _player_deployed.has("dump_west") and GameManager.get_territory_owner("dump_west") == "player":
 		_player_deployed["dump_west"] = []
-		for _j in range(2):
-			var template: Dictionary = all_unit_data[randi() % all_unit_data.size()]
-			var instance: RefCounted = CardInstanceScript.new(template)
-			instance.territory_id = "dump_west"
-			_player_deployed["dump_west"].append(instance)
-			spawned += 1
-		_territory_mgr.update_territory_marker("dump_west")
+		var all_unit_data: Array = CardDatabase._units.values()
+		if not all_unit_data.is_empty():
+			for _j in range(2):
+				var template: Dictionary = all_unit_data[randi() % all_unit_data.size()]
+				var instance: RefCounted = CardInstanceScript.new(template)
+				instance.territory_id = "dump_west"
+				_player_deployed["dump_west"].append(instance)
+				spawned += 1
 	if spawned > 0:
 		_lm("Spawned %d units from territories" % spawned)
-		GameManager.register_player_deployed(_player_deployed)
 
 func _auto_draw_turn() -> void:
 	if _left_deck == null:
@@ -886,3 +969,101 @@ func _on_periodic_triggered(inv_id: String) -> void:
 			inv = c
 			break
 	_research_ui.show_periodic_popup(inv)
+
+func _bot_tick() -> void:
+	if _result_popup != null and _result_popup.is_showing():
+		_result_popup.dismiss()
+		_bot_timer = 0.3
+		return
+	var intro: Node = _find_child_recursive(self, "IntroOverlay")
+	if intro:
+		intro.queue_free()
+		_bot_timer = 0.5
+		return
+	var phase: int = GameManager.get_current_phase()
+	var turn: int = GameManager.get_current_turn()
+	if turn > _bot_max_turns:
+		Logger.info("BOT", "Done! %d turns played" % _bot_max_turns)
+		_bot_active = false
+		return
+	if phase != _bot_last_phase:
+		_bot_phase_done = false
+		_bot_deployed_this_phase = false
+		_bot_last_phase = phase
+		Logger.info("BOT", "Turn %d Phase %d" % [turn, phase])
+	match phase:
+		0, 1, 4:
+			_bot_press_end_phase()
+			_bot_timer = 0.3
+		2:
+			if not _bot_deployed_this_phase:
+				_bot_deploy_card()
+				_bot_deployed_this_phase = true
+				_bot_timer = 0.5
+			else:
+				_bot_press_end_phase()
+				_bot_timer = 0.3
+		3:
+			_bot_phase_done = true
+			_bot_press_end_phase()
+			_bot_timer = 0.5
+		5:
+			_bot_press_end_phase()
+			_bot_timer = 0.5
+		_:
+			_bot_press_end_phase()
+			_bot_timer = 0.3
+
+var _bot_last_phase: int = -1
+
+func _bot_press_end_phase() -> void:
+	end_turn_btn.pressed.emit()
+
+func _bot_deploy_card() -> void:
+	var cards: Array = _hand.get_all()
+	var unit_card: Dictionary = {}
+	for c in cards:
+		if c.get("type", "") in ["unit", "commander"]:
+			unit_card = c
+			break
+	if unit_card.is_empty():
+		Logger.info("BOT", "No unit cards in hand")
+		return
+	var cost: Dictionary = unit_card.get("cost", {})
+	if not GameManager.can_afford(cost):
+		Logger.info("BOT", "Cannot afford %s" % Localization.get_card_name(unit_card))
+		return
+	GameManager.spend(cost)
+	var target: String = ""
+	var adjacent_to_owned: Array = []
+	for t_id in _territory_buttons:
+		var owner: String = GameManager.get_territory_owner(t_id)
+		if owner == "player":
+			var adj: Array = CardDatabase.get_adjacent_territories(t_id)
+			for a in adj:
+				var a_owner: String = GameManager.get_territory_owner(a)
+				if a_owner != "player" and not adjacent_to_owned.has(a):
+					adjacent_to_owned.append(a)
+	for t_id in adjacent_to_owned:
+		target = t_id
+		break
+	if target == "":
+		for t_id in _territory_buttons:
+			if GameManager.get_territory_owner(t_id) != "player":
+				target = t_id
+				break
+	if target == "":
+		target = "dump_west"
+	Logger.info("BOT", "Deploy %s -> %s" % [Localization.get_card_name(unit_card), target])
+	_enter_placing_mode(unit_card)
+	if _placing:
+		_deploy_to_territory(target)
+
+func _find_child_recursive(node: Node, target_name: String) -> Node:
+	if node.name == target_name:
+		return node
+	for child in node.get_children():
+		var found: Node = _find_child_recursive(child, target_name)
+		if found:
+			return found
+	return null

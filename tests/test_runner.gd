@@ -18,6 +18,7 @@ func _init() -> void:
 	test_map_image_exists()
 	test_card_images_exist()
 	test_connections_valid()
+	test_screen_lens()
 
 	print("\n========================================")
 	if _fail_count == 0 and _error_count == 0:
@@ -317,3 +318,46 @@ func test_connections_valid() -> void:
 				connected.append(c.get("to", ""))
 		for tid in t_ids:
 			assert_true(connected.has(tid), "territory '%s' is connected" % tid)
+
+# ============================================
+func test_screen_lens() -> void:
+	suite("Screen Lens")
+	assert_file_exists("res://assets/sprites/map/city_map.jpg", "city_map.jpg for background")
+
+	var city_img := Image.new()
+	var city_ok: bool = (city_img.load("res://assets/sprites/map/city_map.jpg") == OK)
+	assert_true(city_ok, "city_map.jpg loads via Image.load()")
+	if city_ok:
+		assert_gt(city_img.get_width(), 100, "city_map.jpg width > 100")
+
+	var scene_scripts: Dictionary = {
+		"res://scenes/pre_splash.gd": "PreSplash",
+		"res://scenes/splash_screen.gd": "SplashScreen",
+		"res://scenes/main_menu.gd": "MainMenu",
+		"res://scenes/game_map.gd": "GameMap",
+		"res://scenes/settings.gd": "Settings",
+	}
+	for path in scene_scripts:
+		var res = load(path)
+		assert_true(res != null, "%s script compiles (gray screen if FAIL)" % scene_scripts[path])
+
+	var scenes: Array = [
+		"res://scenes/pre_splash.tscn",
+		"res://scenes/splash_screen.tscn",
+		"res://scenes/main_menu.tscn",
+		"res://scenes/game_map.tscn",
+	]
+	for s in scenes:
+		var res = load(s)
+		assert_true(res != null, "%s scene loads (gray screen if FAIL)" % s.get_file())
+
+	var gm_res = load("res://scenes/game_map.tscn")
+	if gm_res != null:
+		var gm = gm_res.instantiate()
+		if gm != null:
+			var map_area = gm.get_node_or_null("MapArea")
+			assert_true(map_area != null, "game_map has MapArea node")
+			if map_area != null:
+				var city_bg = map_area.get_node_or_null("CityBg")
+				assert_true(city_bg != null, "MapArea has CityBg TextureRect (fallback map image)")
+			gm.free()

@@ -43,6 +43,11 @@ func _wait_scene() -> void:
 	var root := get_tree().root
 	if root == null: return
 	for c in root.get_children():
+		if c.name in ["PreSplash", "SplashScreen", "MainMenu", "LangSelect"]:
+			print("BOT: skipping %s -> game_map" % c.name)
+			GameManager.start_game()
+			get_tree().change_scene_to_file("res://scenes/game_map.tscn")
+			return
 		if c.name in ["game_map", "GameMap"]:
 			_gm = c
 			_state = State.INIT

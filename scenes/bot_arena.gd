@@ -69,7 +69,7 @@ func _build_map() -> void:
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.z_index = -1
 	map_area.add_child(bg)
-	var tex := load("res://assets/sprites/map/city_map.jpg")
+	var tex := SafeLoader.texture("res://assets/sprites/map/city_map.jpg")
 	if tex:
 		var img := TextureRect.new()
 		img.texture = tex

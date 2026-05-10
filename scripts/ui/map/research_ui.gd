@@ -82,16 +82,13 @@ func _add_invention_card(inv: Dictionary) -> void:
 	vbox.add_child(btn)
 
 func _load_invention_portrait(inv_id: String) -> Texture2D:
-	for ext in [".png", ".jpg"]:
-		var path: String = "res://assets/sprites/cards/situations/%s%s" % [inv_id, ext]
-		if ResourceLoader.exists(path):
-			var res: Resource = load(path)
-			if res is Texture2D:
-				return res as Texture2D
-		if FileAccess.file_exists(path):
-			var img := Image.new()
-			if img.load(path) == OK:
-				return ImageTexture.create_from_image(img)
+	var dirs := ["inventions", "situations"]
+	for dir in dirs:
+		for ext in [".png", ".jpg"]:
+			var path: String = "res://assets/sprites/cards/%s/%s%s" % [dir, inv_id, ext]
+			var tex := SafeLoader.texture(path)
+			if tex != null:
+				return tex
 	return null
 
 func _on_research_pick(inv_id: String) -> void:

@@ -39,7 +39,7 @@ func setup(territory_id: String, attacker_units: Array, defender_units: Array, p
 	_result_data = {}
 
 	var t: Dictionary = CardDatabase.get_territory(territory_id)
-	territory_label.text = t.get("name_ru", territory_id) if not t.is_empty() else territory_id
+	territory_label.text = Localization.get_territory_name(t) if not t.is_empty() else territory_id
 
 	if player_is_attacker:
 		title_label.text = Localization.t("battle.title.attack")

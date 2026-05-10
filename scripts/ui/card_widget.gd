@@ -11,6 +11,8 @@ func _ready() -> void:
 	custom_minimum_size = Vector2(250, 375)
 	size = Vector2(250, 375)
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	if Localization != null:
+		Localization.language_changed.connect(func(_l): queue_redraw())
 
 func setup(data: Dictionary) -> void:
 	_card_data = data
@@ -54,7 +56,7 @@ func _draw() -> void:
 	else:
 		var ph_color := _get_type_color(card_type, rarity).darkened(0.7)
 		draw_rect(rect, ph_color, true)
-		var name_str: String = _card_data.get("name_ru", _card_data.get("id", ""))
+		var name_str: String = Localization.get_card_name(_card_data)
 		var ph_font := ThemeDB.fallback_font
 		var lines := _wrap_text(name_str, ph_font, 24, w - 16)
 		var start_y: float = h * 0.5 - float(lines.size()) * 14.0
@@ -65,7 +67,7 @@ func _draw() -> void:
 	draw_rounded_rect(Rect2(0, 0, w, h), Color.TRANSPARENT, radius, border_color, 3.0)
 
 	var font := ThemeDB.fallback_font
-	var name_str2: String = _card_data.get("name_ru", _card_data.get("id", ""))
+	var name_str2: String = Localization.get_card_name(_card_data)
 	var name_size: int = 24
 	var name_lines: Array = _wrap_text(name_str2, font, name_size, w - 12)
 	var name_y: float = h * 0.44 - float(name_lines.size() - 1) * (name_size + 2) * 0.5
@@ -97,7 +99,7 @@ func _draw() -> void:
 		draw_string(font, Vector2(col_w * 1.0 + 6, stat_y + stat_size + label_size + 2), "DEF", HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(1, 1, 1))
 		draw_string_outline(font, Vector2(col_w * 2.0 + 6, stat_y + stat_size + label_size + 2), "HP", HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, 2, Color(0, 0, 0))
 		draw_string(font, Vector2(col_w * 2.0 + 6, stat_y + stat_size + label_size + 2), "HP", HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(1, 1, 1))
-		var desc: String = _card_data.get("description_ru", "")
+		var desc: String = Localization.get_card_description(_card_data)
 		if desc != "":
 			var unit_desc_size: int = 18
 			var unit_line_h: float = unit_desc_size + 3
@@ -109,7 +111,7 @@ func _draw() -> void:
 				draw_string_outline(font, Vector2(6, desc_y + i * unit_line_h), lines[i], HORIZONTAL_ALIGNMENT_LEFT, w - 12, unit_desc_size, 2, Color(0, 0, 0))
 				draw_string(font, Vector2(6, desc_y + i * unit_line_h), lines[i], HORIZONTAL_ALIGNMENT_LEFT, w - 12, unit_desc_size, Color(1, 1, 1))
 	else:
-		var desc: String = _card_data.get("description_ru", "")
+		var desc: String = Localization.get_card_description(_card_data)
 		var lines := _wrap_text(desc, font, desc_size, w - 12)
 		for i in range(mini(lines.size(), 5)):
 			draw_string_outline(font, Vector2(6, stat_y + i * line_h), lines[i], HORIZONTAL_ALIGNMENT_LEFT, w - 12, desc_size, 2, Color(0, 0, 0))
@@ -206,15 +208,7 @@ func _get_portrait_path() -> String:
 func _load_image(path: String) -> Texture2D:
 	if path == "":
 		return null
-	if ResourceLoader.exists(path):
-		var res: Resource = load(path)
-		if res is Texture2D:
-			return res as Texture2D
-	var img: Image = Image.new()
-	if img.load(path) == OK:
-		var tex: Texture2D = ImageTexture.create_from_image(img)
-		return tex
-	return null
+	return SafeLoader.texture(path)
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:

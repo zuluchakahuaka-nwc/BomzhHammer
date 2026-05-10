@@ -55,15 +55,23 @@ func show_intro() -> void:
 	var sp1 := Control.new()
 	sp1.custom_minimum_size = Vector2(0, 25)
 	vbox.add_child(sp1)
-	var intro := Label.new()
-	intro.text = Localization.t("intro.text")
-	intro.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	intro.custom_minimum_size = Vector2(0, 0)
-	intro.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	intro.add_theme_font_size_override("font_size", 30)
-	intro.add_theme_color_override("font_color", Color(1, 1, 1))
-	vbox.add_child(intro)
+	var raw_text: String = Localization.t("intro.text").replace("\\n\\n", "\n\n\n")
+	var paragraphs: PackedStringArray = raw_text.split("\n\n\n")
+	for para_text in paragraphs:
+		if para_text.strip_edges() == "":
+			continue
+		var para := Label.new()
+		para.text = para_text.strip_edges()
+		para.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		para.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		para.custom_minimum_size = Vector2(0, 0)
+		para.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		para.add_theme_font_size_override("font_size", 30)
+		para.add_theme_color_override("font_color", Color(1, 1, 1))
+		vbox.add_child(para)
+		var spacer := Control.new()
+		spacer.custom_minimum_size = Vector2(0, 20)
+		vbox.add_child(spacer)
 	var sp2 := Control.new()
 	sp2.custom_minimum_size = Vector2(0, 20)
 	vbox.add_child(sp2)
@@ -162,14 +170,9 @@ func load_card_portrait(card_data: Dictionary) -> Texture2D:
 	var sub: String = sub_map.get(card_type, "units")
 	for ext in [".png", ".jpg"]:
 		var path: String = "res://assets/sprites/cards/%s/%s%s" % [sub, card_id, ext]
-		if ResourceLoader.exists(path):
-			var res: Resource = load(path)
-			if res is Texture2D:
-				return res as Texture2D
-		if FileAccess.file_exists(path):
-			var img := Image.new()
-			if img.load(path) == OK:
-				return ImageTexture.create_from_image(img)
+		var tex := SafeLoader.texture(path)
+		if tex != null:
+			return tex
 	return null
 
 func show_deploy_feedback(t_id: String, card_name: String) -> void:

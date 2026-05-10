@@ -24,10 +24,9 @@ func _load_frames() -> void:
 	]
 	for n in names:
 		var path: String = "res://assets/sprites/battle_anim/%s.jpg" % n
-		if ResourceLoader.exists(path):
-			var tex: Resource = load(path)
-			if tex is Texture2D:
-				_frames.append(tex)
+		var tex := SafeLoader.texture(path)
+		if tex:
+			_frames.append(tex)
 
 func get_frame_count() -> int:
 	return _frames.size()

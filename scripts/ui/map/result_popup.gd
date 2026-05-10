@@ -8,10 +8,8 @@ var _active: Control = null
 
 func _init(map: Control) -> void:
 	_map = map
-	if ResourceLoader.exists("res://assets/sprites/ui/victory_capture.jpg"):
-		_victory_tex = load("res://assets/sprites/ui/victory_capture.jpg")
-	if ResourceLoader.exists("res://assets/sprites/ui/defeat_capture.jpg"):
-		_defeat_tex = load("res://assets/sprites/ui/defeat_capture.jpg")
+	_victory_tex = SafeLoader.texture("res://assets/sprites/ui/victory_capture.jpg")
+	_defeat_tex = SafeLoader.texture("res://assets/sprites/ui/defeat_capture.jpg")
 
 func show_victory(territory_name: String) -> void:
 	_show(territory_name, true)
@@ -22,19 +20,24 @@ func show_defeat(territory_name: String) -> void:
 func is_showing() -> bool:
 	return _active != null and is_instance_valid(_active)
 
+func dismiss() -> void:
+	if _active != null and is_instance_valid(_active):
+		_active.queue_free()
+	_active = null
+
 func _show(territory_name: String, is_victory: bool) -> void:
 	if _active != null and is_instance_valid(_active):
 		_active.queue_free()
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.z_index = 400
-	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.mouse_filter = Control.MOUSE_FILTER_PASS
 	_map.add_child(overlay)
 
 	var bg := ColorRect.new()
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.color = Color(0, 0, 0, 0.75)
-	bg.mouse_filter = Control.MOUSE_FILTER_STOP
+	bg.color = Color(0, 0, 0, 0.55)
+	bg.mouse_filter = Control.MOUSE_FILTER_PASS
 	overlay.add_child(bg)
 
 	var center := CenterContainer.new()
@@ -79,7 +82,7 @@ func _show(territory_name: String, is_victory: bool) -> void:
 	vbox.add_child(where)
 
 	var hint := Label.new()
-	hint.text = "нажмите чтобы продолжить"
+	hint.text = Localization.t("popup.click_to_close") if Localization.t("popup.click_to_close") != "popup.click_to_close" else "нажмите чтобы продолжить"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_font_size_override("font_size", 18)
 	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
@@ -93,18 +96,18 @@ func _show(territory_name: String, is_victory: bool) -> void:
 		if _active == overlay:
 			_active = null
 	bg.gui_input.connect(func(ev: InputEvent) -> void:
-		if ev is InputEventMouseButton and ev.pressed:
+		if (ev is InputEventMouseButton and ev.pressed) or (ev is InputEventKey and ev.pressed):
 			cb.call()
 	)
 	overlay.gui_input.connect(func(ev: InputEvent) -> void:
-		if ev is InputEventMouseButton and ev.pressed:
+		if (ev is InputEventMouseButton and ev.pressed) or (ev is InputEventKey and ev.pressed):
 			cb.call()
 	)
 
 	overlay.modulate = Color(1, 1, 1, 0)
 	var tw := _map.create_tween()
-	tw.tween_property(overlay, "modulate:a", 1.0, 0.3)
-	tw.tween_interval(3.0)
-	tw.tween_property(overlay, "modulate:a", 0.0, 0.8)
+	tw.tween_property(overlay, "modulate:a", 1.0, 0.2)
+	tw.tween_interval(1.5)
+	tw.tween_property(overlay, "modulate:a", 0.0, 0.5)
 	tw.tween_callback(cb)
 	_active = overlay

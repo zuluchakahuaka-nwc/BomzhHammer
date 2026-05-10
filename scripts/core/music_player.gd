@@ -73,18 +73,8 @@ func _play_current() -> void:
 	_player.play()
 
 func _load_audio(path: String) -> AudioStream:
-	var ext := path.get_extension().to_lower()
-	if ext == "mp3":
-		var f := FileAccess.open(path, FileAccess.READ)
-		if f == null:
-			return null
-		var data := f.get_buffer(f.get_length())
-		f.close()
-		var stream := AudioStreamMP3.new()
-		stream.data = data
-		return stream
-	var stream := load(path)
-	if stream is AudioStream:
+	var stream := SafeLoader.audio(path)
+	if stream:
 		return stream
 	return null
 

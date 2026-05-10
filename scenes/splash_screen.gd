@@ -52,8 +52,8 @@ func _skip_to_menu() -> void:
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 func _load_fonts() -> void:
-	var font := load("res://assets/fonts/BlackOpsOne.ttf")
-	if font and font is FontFile:
+	var font := SafeLoader.font("res://assets/fonts/BlackOpsOne.ttf")
+	if font:
 		logo_label.add_theme_font_override("font", font)
 		subtitle_label.add_theme_font_override("font", font)
 

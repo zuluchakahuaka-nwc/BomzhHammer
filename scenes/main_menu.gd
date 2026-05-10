@@ -43,9 +43,9 @@ func _refresh_all_text() -> void:
 	settings_btn.text = Localization.t("btn.settings")
 	quit_btn.text = Localization.t("btn.quit")
 	if bot_arena_btn:
-		bot_arena_btn.text = Localization.t("btn.new_game")
+		bot_arena_btn.text = Localization.t("btn.bot_arena")
 	if card_review_btn:
-		card_review_btn.text = Localization.t("btn.continue")
+		card_review_btn.text = Localization.t("btn.card_review")
 	var lang_names := {"ru": "РУССКИЙ", "en": "ENGLISH"}
 	var code := Localization.get_language()
 	if lang_btn:
@@ -85,18 +85,24 @@ func _on_language() -> void:
 	Localization.set_language(next)
 
 func _load_fonts() -> void:
-	var title_font := load("res://assets/fonts/BlackOpsOne.ttf")
-	if title_font and title_font is FontFile:
+	var logo_node = get_node_or_null("VBoxContainer/Logo")
+	if logo_node:
+		logo_node.texture = SafeLoader.texture("res://assets/sprites/splash/logos/logo_5.jpg")
+	var tv_bg = get_node_or_null("BomzhTV/TVBackground")
+	if tv_bg:
+		tv_bg.texture = SafeLoader.texture("res://assets/sprites/splash/bomzh_tv_bg.jpg")
+	var title_font := SafeLoader.font("res://assets/fonts/BlackOpsOne.ttf")
+	if title_font:
 		title_label.add_theme_font_override("font", title_font)
 		subtitle_label.add_theme_font_override("font", title_font)
-	var btn_font := load("res://assets/fonts/Cinzel-Bold.ttf")
-	if btn_font and btn_font is FontFile:
+	var btn_font := SafeLoader.font("res://assets/fonts/Cinzel-Bold.ttf")
+	if btn_font:
 		new_game_btn.add_theme_font_override("font", btn_font)
 		continue_btn.add_theme_font_override("font", btn_font)
 		settings_btn.add_theme_font_override("font", btn_font)
 		quit_btn.add_theme_font_override("font", btn_font)
 
 func _setup_bomzh_tv() -> void:
-	var tv_font := load("res://assets/fonts/Philosopher-BoldItalic.ttf")
-	if tv_font and tv_font is FontFile:
+	var tv_font := SafeLoader.font("res://assets/fonts/Philosopher-BoldItalic.ttf")
+	if tv_font:
 		tv_label.add_theme_font_override("font", tv_font)

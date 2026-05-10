@@ -21,6 +21,17 @@ grow_horizontal = 2
 grow_vertical = 2
 clip_contents = true
 
+[node name="CityBg" type="TextureRect" parent="MapArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+z_index = -1
+
 [node name="TopBar" type="PanelContainer" parent="."]
 anchor_right = 1.0
 offset_bottom = 80.0
