@@ -15,3 +15,7 @@ import_log.txt
 debug_*.png
 bot_test_log.txt
 ui_bot_log.txt
+
+*.md
+!README.md
+ui_bot_log.txt

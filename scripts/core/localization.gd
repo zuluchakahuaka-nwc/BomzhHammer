@@ -4,7 +4,7 @@ signal language_changed(lang: String)
 
 const SAVE_PATH: String = "user://settings.json"
 
-var _current_lang: String = "ru"
+var _current_lang: String = "en"
 var _translations: Dictionary = {}
 var _available_languages: PackedStringArray = []
 
@@ -46,6 +46,8 @@ func _load_saved_language() -> void:
 		var sys_lang: String = TranslationServer.get_locale()
 		if sys_lang.begins_with("ru"):
 			_current_lang = "ru"
+		else:
+			_current_lang = "en"
 		return
 	var file: FileAccess = FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if file == null:
