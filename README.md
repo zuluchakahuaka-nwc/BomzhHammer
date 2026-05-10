@@ -1,5 +1,13 @@
 # BomzhHammer
 
+### [>>> DOWNLOAD <<<](https://github.com/zuluchakahuaka-nwc/BomzhHammer/releases/tag/v0.2-alpha) | [СКАЧАТЬ <<<](https://github.com/zuluchakahuaka-nwc/BomzhHammer/releases/tag/v0.2-alpha)
+
+Download ZIP → Unzip → Double-click `Play.bat` → Play!
+
+Скачай ZIP → Распакуй → Двойной клик `Play.bat` → Играй!
+
+---
+
 Post-Soviet satirical card strategy game. Homeless empires fight for control of dumps, train stations and garbage bins.
 
 ## Download & Play
