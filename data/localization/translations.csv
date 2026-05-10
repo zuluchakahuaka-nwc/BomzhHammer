@@ -1,0 +1,97 @@
+﻿key,ru,en
+game.title,BOMZHAMMER,BOMZHAMMER
+game.subtitle,ПЕРЕГАР СВОБОДЫ,HANGOVER OF FREEDOM
+phase.resources,Ресурсы,Resources
+phase.draw,Розыгрыш,Draw
+phase.movement,Перемещение,Movement
+phase.combat,Бой,Combat
+phase.events,События,Events
+phase.end,Конец,End
+ideology.alcoholism,Алкоголизм,Alcoholism
+ideology.alcoholism.desc,Тоталитарный строй. 0 налогов. Водка правит.,Totalitarian. 0 taxes. Vodka rules.
+ideology.dermocracy,Дерьмократия,Dermocracy
+ideology.dermocracy.desc,Высокие прибыли. Свободный рынок мусора.,High profits. Free garbage market.
+religion.mnogobomzhie,Многобомжие,Polyhomelessism
+religion.mnogobomzhie.desc,Верование в древних богов-бомжей.,Belief in ancient hobo gods.
+religion.trezvost,Трезвость,Sobriety
+religion.trezvost.desc,Путь воздержания. Эффективная работа.,Path of abstinence. Efficient work.
+respect.legend,Легенда,Legend
+respect.authority,Авторитет,Authority
+respect.normal,Нормально,Normal
+respect.neutral,Нейтрально,Neutral
+respect.disrespect,Неуважение,Disrespect
+respect.panik,Паника,Panic
+respect.collapse,Крах,Collapse
+resource.bottles,Бутылки,Bottles
+resource.aluminum,Алюминь,Aluminum
+resource.coins,Мелочишка,Coins
+resource.vodka,Водка,Vodka
+resource.cardboard,Картон,Cardboard
+btn.new_game,НОВАЯ ИГРА,NEW GAME
+btn.continue,ПРОДОЛЖИТЬ,CONTINUE
+btn.settings,НАСТРОЙКИ,SETTINGS
+btn.quit,ВЫХОД,QUIT
+btn.end_phase,КОНЕЦ ФАЗЫ,END PHASE
+btn.back,НАЗАД,BACK
+btn.fight,ДРАТЬСЯ!,FIGHT!
+btn.close,ЗАКРЫТЬ,CLOSE
+event.oblava,Облава!,Raid!
+event.alco_coma,Алкогольная кома!,Alcohol coma!
+event.golod,Голод!,Famine!
+event.cirroz,Цирроз!,Cirrhosis!
+event.koreycy,Национальное блюдо!,National dish!
+splash.tap,НАЖМИТЕ ЧТОБЫ НАЧАТЬ,TAP TO START
+turn.label,Ход %d,Turn %d
+owner.you,ВЫ,YOU
+owner.enemy,ВРАГ,ENEMY
+owner.neutral,Нейтральная,Neutral
+owner.label,Владелец: ,Owner: 
+terrain.dump,Свалка,Dump
+terrain.station,Вокзал,Station
+terrain.square_three_stations,Пл.3 вокзалов,Square of 3 Stations
+terrain.den,Притон,Den
+terrain.supermarket_dumpster,Мусорка,Dumpster
+terrain.pharmacy_dumpster,Аптека-мусорка,Pharmacy dumpster
+terrain.dacha,Дачи,Dachas
+terrain.obrygalovka,Обрыгаловка,Barf Alley
+terrain.kutuzka,Кутузка,Lockup
+terrain.open_street,Улица,Street
+terrain.type_label,Тип: ,Type: 
+buyout.label,ВЫКУП: %d мелочишки (или захват),BUYOUT: %d coins (or capture)
+buyout.button,ВЫКУПИТЬ (%d мелочишки),BUYOUT (%d coins)
+territory.resources,Бутылки:%d Мелочишка:%d Водка:%d,Bottles:%d Coins:%d Vodka:%d
+ideology.none,Нет строя,No ideology
+happiness.obnoxious,ОБНАГЛЕЛИ — бунт неизбежен!,OBNOXIOUS — riot inevitable!
+happiness.complacent,Слишком довольны,Too complacent
+happiness.happy,Довольны,Happy
+happiness.normal,Нормально,Normal
+happiness.unhappy,Недовольны,Unhappy
+happiness.rebellious,Голодный бунт близок!,Hungry riot approaching!
+happiness.riot,ГОЛОДНЫЙ БУНТ!,HUNGRY RIOT!
+battle.start,"[b]Бой начинается![/b]\n","[b]Battle begins![/b]\n"
+population.label,Бомжи: %d,Hobos: %d
+respect.label,Уважение: %d,Respect: %d
+battle.title.attack,АТАКА,ATTACK
+battle.title.defense,ЗАЩИТА,DEFENSE
+battle.btn.attack,Атаковать свалку,Attack the dump
+battle.btn.defend,Защищать свалку,Defend the dump
+battle.player.attack,ВАШИ (АТАКА),YOURS (ATTACK)
+battle.player.defense,ВАШИ (ОБОРОНА),YOURS (DEFENSE)
+battle.enemy.defense,ОБОРОНА,DEFENSE
+battle.enemy.attackers,НАПАДАЮЩИЕ,ATTACKERS
+battle.result.win,ПОБЕДА!,VICTORY!
+battle.result.loss,ПОРАЖЕНИЕ,DEFEAT
+battle.btn.continue,Продолжить,Continue
+battle.log.vs,против,vs
+save.auto,Автосохранение,Auto-save
+save.loaded,Игра загружена (Ход %d),Game loaded (Turn %d)
+save.not_found,Сохранение не найдено,No save found
+btn.language,ЯЗЫК,LANGUAGE
+quote.institutions,"Институты отмечают большие пробелы в данных и разные определения бездомности, поэтому «сколько в мире бездомных» не может быть точно указано сейчас.","Research institutions note major data gaps and varying definitions of homelessness, so ""how many homeless people are there worldwide"" cannot be precisely stated at this time."
+quote.un_habitat,"UN-Habitat приводит оценку примерно 1,6 млрд человек, живущих в «неадекватном, переполненном и небезопасном жилье» (это шире классической «бездомности»).","UN-Habitat estimates approximately 1.6 billion people living in ""inadequate, overcrowded and unsafe housing"" (broader than classic ""homelessness"")."
+quote.source,ourworldindata.org / weforum.org,ourworldindata.org / weforum.org
+splash.skip,ПРОБЕЛ — пропустить,SPACE — skip
+intro.title,БОМЖХАММЕР,BOMZHAMMER
+intro.subtitle,Хроники Картонной Империи,Chronicles of the Cardboard Empire
+intro.text,"Кругом лишь руины. Старый мир рухнул. Свалки, опустевшие вокзалы и помойки стали новыми королевствами — и в каждом правит свой бездомный диктатор.\n\nВы — никто. Бездомный бродяга без имени, без прошлого, без будущего. Единственное что у вас есть — охапка картона, пустая бутылка и жажда власти. Ваша империя начнётся с нуля — с одной-единственной Свалки Западной.\n\nСвалка Западная — отправная точка, ваша крепость, ваш трон из мусора. Здесь вы соберёте первых последователей: алкашей, попрошаек, охотников за бутылками. Здесь вы построите первую ночлежку из картона, зальёте фундамент самогоном и поднимете флаг из грязной простыни на вершине мусорной горы.\n\nНо вы не одиноки. На соседних свалках уже хозяйничают конкуренты — бродячие таборы, банды отморозков, самогонные бароны. Вокзалы контролируются трестами попрошаек. Притоны превратились в вооружённые крепости. А элитные помойки возле «Элитвилля» — это территории, за которые идёт война не на жизнь, а на смерть.\n\nВам предстоит выбирать идеологию: станете ли вы Alcohol Dictatorship, держащим подданных на водочной игле, или Der'mokratiей, построенной на свободной торговле краденым? Примете ли вы веру Многобомжие с её идолами свалок и вокзалов, или изберёте путь Трезвости, отказавшись от алкоголя ради производительности?\n\nВпереди — облавы, набеги бродяг, нашествия крыс и тараканов, эпидемии цирроза и похмельные комы. Но впереди также — добыча, победы, изобретения и легендарные отряды, которые донесут ваш картонный стяг до самых далёких помоек.\n\nДобро пожаловать на Свалку Западную. Добро пожаловать в БомжХаммер.","Ruins everywhere. The old world has collapsed. Dumps, abandoned train stations and garbage bins became new kingdoms — each ruled by its own homeless dictator.\n\nYou are nobody. A homeless vagrant with no name, no past, no future. All you have is a bundle of cardboard, an empty bottle, and a thirst for power. Your empire will start from scratch — from a single Western Dump.\n\nThe Western Dump is your starting point, your fortress, your throne of garbage. Here you will gather your first followers: boozers, beggars, bottle hunters. Here you will build the first cardboard shelter, pour the foundation with moonshine, and raise a flag from a dirty bedsheet atop the garbage mountain.\n\nBut you are not alone. Rival gangs already rule neighboring dumps — roaming camps, gangs of thugs, moonshine barons. Train stations are controlled by begging trusts. Dens have become armed fortresses. And the elite dumpsters near ""Eliteville"" are territories where war is fought to the death.\n\nYou must choose your ideology: will you become an Alcohol Dictatorship, keeping subjects on a vodka needle, or a Der'mokratiya built on free trade of stolen goods? Will you embrace the faith of Polyhomelessism with its idols of dumps and stations, or choose the path of Sobriety, renouncing alcohol for productivity?\n\nAhead — raids, vagrant invasions, rat and cockroach plagues, cirrhosis epidemics and hangover comas. But also ahead — loot, victories, inventions and legendary squads that will carry your cardboard banner to the farthest dumpsters.\n\nWelcome to the Western Dump. Welcome to BomzhHammer."
+intro.click,"[ Нажмите чтобы начать ]","[ Click to begin ]"

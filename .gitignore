@@ -1,0 +1,15 @@
+.godot/
+*.import
+*.log
+*.tmp
+*.mp4
+
+Thumbs.db
+.DS_Store
+
+gen_*.ps1
+gen_*.js
+missing_items.json
+remaining.json
+import_log.txt
+debug_*.png

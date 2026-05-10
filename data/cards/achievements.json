@@ -1,0 +1,12 @@
+[
+  {"id": "ach_poproshaynichestvo", "name_ru": "ПОПРОШАЙНИЧЕСТВО", "description_ru": "Первое достижение. Открывает сбор мелочишки.", "effect": "unlock_coins"},
+  {"id": "ach_zhivotnovodstvo", "name_ru": "Животноводство", "description_ru": "Собаки прибегают на свалку.", "effect": "unlock_dogs"},
+  {"id": "ach_bomond_stolicy", "name_ru": "БОМОНД СТОЛИЦЫ", "description_ru": "Захват элитных помоек.", "effect": "respect_bonus_25"},
+  {"id": "ach_legendarny_bomzh", "name_ru": "ЛЕГЕНДАРНЫЙ БОМЖ", "description_ru": "Максимальный ранг.", "effect": "unlock_legendary"},
+  {"id": "ach_religion_mnogobomzhie", "name_ru": "МНОГОБОМЖИЕ", "description_ru": "Верования в древних бомжей-покровителей. Бог свалки, бог вокзала, бог картона, бог полторашки (разные магазины).", "effect": "unlock_religion_mnogobomzhie"},
+  {"id": "ach_religion_trezvost", "name_ru": "ТРЕЗВОСТЬ", "description_ru": "Верование открыто. +производительность, -алкогольные карты.", "effect": "unlock_religion_trezvost"},
+  {"id": "ach_kuzmich_rank", "name_ru": "КУЗЬМИЧ", "description_ru": "Высший ранг. Открывает элитные отряды.", "effect": "unlock_kuzmich"},
+  {"id": "ach_battle_hunter", "name_ru": "ОХОТНИК ЗА БУТЫЛКАМИ", "description_ru": "Первый элитный отряд.", "effect": "unlock_hunter"},
+  {"id": "ach_capture_station", "name_ru": "ВОКЗАЛЬНЫЙ БАРОН", "description_ru": "Захватить вокзал.", "effect": "respect_bonus_10"},
+  {"id": "ach_three_stations", "name_ru": "ВЛАДЕЛЕЦ ПЯТИДЕСЯТИ ВОКЗАЛОВ", "description_ru": "Контроль площади пятидесяти вокзалов.", "effect": "unlock_mega_bonus"}
+]

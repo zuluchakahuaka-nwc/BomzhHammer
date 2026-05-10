@@ -1,0 +1,12 @@
+[
+  {"id": "inv_samogon_reactor", "name_ru": "Самогонный реактор", "description_ru": "Счастье +100. Производит водку каждый ход.", "effect": "happiness_boost", "amount": 100, "turns_to_research": 4},
+  {"id": "inv_kartonnaya_bronya", "name_ru": "Картонная броня", "description_ru": "Защита +3 всем отрядам.", "effect": "defense_bonus_all", "amount": 3, "turns_to_research": 4},
+  {"id": "inv_paraplan", "name_ru": "Картонные парапланы", "description_ru": "Разведка территорий. +1 движение всем.", "effect": "movement_bonus_all", "amount": 1, "turns_to_research": 4},
+  {"id": "inv_alcobattery", "name_ru": "Алкобатарея", "description_ru": "Атака +2 всем отрядам с тегом drinker.", "effect": "attack_bonus_tag", "amount": 2, "tag": "drinker", "turns_to_research": 4},
+  {"id": "inv_sbornaya_liniya", "name_ru": "Сборочная линия", "description_ru": "Производство +3 каждый ход.", "effect": "production_bonus", "amount": 3, "turns_to_research": 4},
+  {"id": "inv_tsar_banka", "name_ru": "Царь-банка", "description_ru": "Доход +5 бутылок каждый ход.", "effect": "income_bonus", "amount": 5, "resource": "bottles", "turns_to_research": 4},
+  {"id": "inv_nasmork", "name_ru": "Незамерзайка-2", "description_ru": "Движение +2 всем отрядам зимой.", "effect": "movement_winter", "amount": 2, "turns_to_research": 4},
+  {"id": "inv_bomzh_net", "name_ru": "Бомж-Нет (система связи)", "description_ru": "Уважение +10. Разведка врагов каждый ход.", "effect": "respect_and_spy", "amount": 10, "turns_to_research": 4},
+  {"id": "inv_dezinfekciya", "name_ru": "Дезинсекция", "description_ru": "Уничтожает тараканов и крыс. Срабатывает автоматически каждые 10 ходов.", "effect": "disinfection", "amount": 0, "periodic": true, "cooldown": 10, "turns_to_research": 4},
+  {"id": "inv_zhivotnovodstvo", "name_ru": "Животноводство", "description_ru": "Бродячие собаки прибегают на свалку. Помогают в обороне +2.", "effect": "defense_bonus_tag", "amount": 2, "tag": "beast", "turns_to_research": 4}
+]

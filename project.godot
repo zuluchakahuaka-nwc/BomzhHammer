@@ -1,0 +1,55 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="BOMZHAMMER"
+config/description="BOMZHAMMER — карточная стратегия о бездомных империях"
+run/main_scene="res://scenes/pre_splash.tscn"
+config/features=PackedStringArray("4.2")
+
+[autoload]
+
+Logger="*res://scripts/core/logger.gd"
+ErrorParser="*res://scripts/core/error_parser.gd"
+Localization="*res://scripts/core/localization.gd"
+GameManager="*res://scripts/core/game_manager.gd"
+CardDatabase="*res://scripts/cards/card_database.gd"
+ResourceManager="*res://scripts/core/resource_manager.gd"
+IdeologySystem="*res://scripts/core/ideology_system.gd"
+ReligionSystem="*res://scripts/core/religion_system.gd"
+AchievementSystem="*res://scripts/core/achievement_system.gd"
+BuildingSystem="*res://scripts/core/building_system.gd"
+HappinessSystem="*res://scripts/core/happiness_system.gd"
+RiotSystem="*res://scripts/core/riot_system.gd"
+QuestSystem="*res://scripts/core/quest_system.gd"
+AIController="*res://scripts/ai/ai_controller.gd"
+ResearchSystem="*res://scripts/core/research_system.gd"
+SaveManager="*res://scripts/core/save_manager.gd"
+MusicPlayer="*res://scripts/core/music_player.gd"
+GameBot="res://scripts/ui/bot_visual.gd"
+
+[display]
+
+window/size/viewport_width=1080
+window/size/viewport_height=1920
+window/size/mode=2
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

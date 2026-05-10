@@ -1,0 +1,474 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/game_map.gd" id="1"]
+
+[node name="GameMap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="MapArea" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 80.0
+offset_bottom = -400.0
+grow_horizontal = 2
+grow_vertical = 2
+clip_contents = true
+
+[node name="TopBar" type="PanelContainer" parent="."]
+anchor_right = 1.0
+offset_bottom = 80.0
+z_index = 10
+
+[node name="HBox" type="HBoxContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ReligionLabel" type="Label" parent="TopBar/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "Верование: —"
+
+[node name="TurnLabel" type="Label" parent="TopBar/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "Ход 1"
+
+[node name="PhaseLabel" type="Label" parent="TopBar/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "Ресурсы"
+
+[node name="IdeologyLabel" type="Label" parent="TopBar/HBox"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "Строй: —"
+
+[node name="Spacer" type="Control" parent="TopBar/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SettingsButton" type="Button" parent="TopBar/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+custom_minimum_size = Vector2(60, 50)
+text = "⚙"
+
+[node name="MenuButton" type="Button" parent="TopBar/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+custom_minimum_size = Vector2(80, 50)
+text = "Меню"
+
+[node name="HelpButton" type="Button" parent="TopBar/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+custom_minimum_size = Vector2(110, 50)
+text = "Помощь"
+
+[node name="BottomBg" type="ColorRect" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -500.0
+	z_index = 10
+	color = Color(0.06, 0.05, 0.03, 0.95)
+
+[node name="ResourceBar" type="HBoxContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -500.0
+offset_bottom = -410.0
+offset_left = 8.0
+offset_right = -8.0
+z_index = 11
+theme_override_constants/separation = 20
+
+[node name="BottlesLabel" type="Label" parent="ResourceBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "Бутылки: 5"
+
+[node name="AluminumLabel" type="Label" parent="ResourceBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "Алюминь: 3"
+
+[node name="CoinsLabel" type="Label" parent="ResourceBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "Мелочишка: 3"
+
+[node name="VodkaLabel" type="Label" parent="ResourceBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "Водка: 2"
+
+[node name="CardboardLabel" type="Label" parent="ResourceBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "Картон: 4"
+
+[node name="RespectLabel" type="Label" parent="ResourceBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "Уважение: 0"
+
+[node name="PopLabel" type="Label" parent="ResourceBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "Бомжи: 10"
+
+[node name="HandArea" type="HBoxContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -390.0
+offset_left = 4.0
+offset_right = -4.0
+z_index = 12
+custom_minimum_size = Vector2(0, 350)
+theme_override_constants/separation = 4
+
+[node name="UnitSide" type="Control" parent="HandArea"]
+layout_mode = 2
+custom_minimum_size = Vector2(400, 350)
+size_flags_horizontal = 3
+clip_contents = true
+
+[node name="SitSide" type="Control" parent="HandArea"]
+layout_mode = 2
+custom_minimum_size = Vector2(400, 350)
+size_flags_horizontal = 3
+clip_contents = true
+
+[node name="EndTurnButton" type="Button" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -500.0
+offset_top = -100.0
+offset_right = -8.0
+offset_bottom = -8.0
+z_index = 15
+theme_override_font_sizes/font_size = 56
+custom_minimum_size = Vector2(490, 90)
+text = "КОНЕЦ ФАЗЫ"
+
+[node name="EffectsPanel" type="VBoxContainer" parent="."]
+anchors_preset = 11
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 780.0
+offset_top = 80.0
+offset_right = -8.0
+offset_bottom = -400.0
+z_index = 14
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="EffectsPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "Эффекты ▼"
+
+[node name="ToggleBtn" type="Button" parent="EffectsPanel"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 36)
+theme_override_font_sizes/font_size = 18
+text = "▼"
+
+[node name="EffectsGrid" type="GridContainer" parent="EffectsPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 10
+
+[node name="CardDetailPopup" type="Control" parent="."]
+visible = false
+z_index = 100
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="CardDetailPopup"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="DetailPreview" type="Control" parent="CardDetailPopup"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -210.0
+offset_right = 140.0
+offset_bottom = 210.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayButton" type="Button" parent="CardDetailPopup"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -80.0
+offset_top = 230.0
+offset_right = 80.0
+offset_bottom = 275.0
+grow_horizontal = 2
+grow_vertical = 2
+z_index = 101
+theme_override_font_sizes/font_size = 24
+text = "ИГРАТЬ"
+
+[node name="CloseBtn" type="Button" parent="CardDetailPopup"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -280.0
+offset_right = 60.0
+offset_bottom = -245.0
+grow_horizontal = 2
+grow_vertical = 2
+z_index = 101
+theme_override_font_sizes/font_size = 20
+text = "X"
+
+[node name="TerritoryInfoPanel" type="PanelContainer" parent="."]
+visible = false
+z_index = 50
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -450.0
+offset_top = 90.0
+offset_bottom = 600.0
+grow_horizontal = 0
+
+[node name="TVBox" type="VBoxContainer" parent="TerritoryInfoPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TImage" type="TextureRect" parent="TerritoryInfoPanel/TVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(430, 280)
+expand_mode = 1
+stretch_mode = 6
+
+[node name="TName" type="Label" parent="TerritoryInfoPanel/TVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Территория"
+horizontal_alignment = 1
+
+[node name="TOwner" type="Label" parent="TerritoryInfoPanel/TVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Владелец: Вы"
+horizontal_alignment = 1
+
+[node name="TTerrain" type="Label" parent="TerritoryInfoPanel/TVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Тип: свалка"
+horizontal_alignment = 1
+
+[node name="TUnitsLabel" type="Label" parent="TerritoryInfoPanel/TVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Отряды:"
+
+[node name="TClose" type="Button" parent="TerritoryInfoPanel/TVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "ЗАКРЫТЬ"
+
+[node name="TBuyout" type="Button" parent="TerritoryInfoPanel/TVBox"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "ВЫКУПИТЬ"
+
+[node name="DrawPopup" type="Control" parent="."]
+visible = false
+z_index = 100
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="DrawPopup"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="CardPreview" type="Control" parent="DrawPopup"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -220.0
+offset_right = 150.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TerritoryOverlay" type="Control" parent="."]
+visible = false
+z_index = 150
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 0.72
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResearchPopup" type="Control" parent="."]
+visible = false
+z_index = 200
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="ResearchPopup"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.75)
+
+[node name="Title" type="Label" parent="ResearchPopup"]
+anchor_left = 0.3
+anchor_top = 0.04
+anchor_right = 0.7
+anchor_bottom = 0.09
+theme_override_font_sizes/font_size = 38
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "НИЩИЕ УЧЁНЫЕ: ЧТО ИЗУЧАТЬ?"
+horizontal_alignment = 1
+
+[node name="CurrentLabel" type="Label" parent="ResearchPopup"]
+anchor_left = 0.2
+anchor_top = 0.09
+anchor_right = 0.8
+anchor_bottom = 0.13
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = ""
+horizontal_alignment = 1
+
+[node name="InventionsScroll" type="ScrollContainer" parent="ResearchPopup"]
+anchor_left = 0.02
+anchor_top = 0.14
+anchor_right = 0.98
+anchor_bottom = 0.88
+
+[node name="InventionsGrid" type="GridContainer" parent="ResearchPopup/InventionsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 4
+
+[node name="CloseBtn" type="Button" parent="ResearchPopup"]
+anchor_left = 0.35
+anchor_top = 0.9
+anchor_right = 0.65
+anchor_bottom = 0.96
+theme_override_font_sizes/font_size = 36
+custom_minimum_size = Vector2(0, 70)
+text = "ЗАКРЫТЬ"
+
+[node name="Bg" type="ColorRect" parent="TerritoryOverlay"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.85)
+
+[node name="ImgWrap" type="CenterContainer" parent="TerritoryOverlay"]
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.45
+
+[node name="TImage" type="TextureRect" parent="TerritoryOverlay/ImgWrap"]
+custom_minimum_size = Vector2(1600, 900)
+expand_mode = 1
+stretch_mode = 6
+
+[node name="TInfo" type="VBoxContainer" parent="TerritoryOverlay"]
+anchor_left = 0.02
+anchor_top = 0.45
+anchor_right = 0.98
+anchor_bottom = 0.97
+
+[node name="TName" type="Label" parent="TerritoryOverlay/TInfo"]
+theme_override_font_sizes/font_size = 36
+text = "Territory"
+horizontal_alignment = 1
+
+[node name="TDetails" type="Label" parent="TerritoryOverlay/TInfo"]
+theme_override_font_sizes/font_size = 22
+text = ""
+
+[node name="UnitsScroll" type="ScrollContainer" parent="TerritoryOverlay/TInfo"]
+custom_minimum_size = Vector2(0, 400)
+horizontal_scroll_mode = 1
+
+[node name="UnitsHBox" type="HBoxContainer" parent="TerritoryOverlay/TInfo/UnitsScroll"]
+theme_override_constants/separation = 12
+
+[node name="TClose" type="Button" parent="TerritoryOverlay/TInfo"]
+custom_minimum_size = Vector2(0, 80)
+theme_override_font_sizes/font_size = 36
+text = "ЗАКРЫТЬ"
