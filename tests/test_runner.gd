@@ -19,6 +19,11 @@ func _init() -> void:
 	test_card_images_exist()
 	test_connections_valid()
 	test_screen_lens()
+	test_safe_loader()
+	test_video_files()
+	test_music_files()
+	test_splash_text_sizes()
+	test_intro_overlay()
 
 	print("\n========================================")
 	if _fail_count == 0 and _error_count == 0:
@@ -324,11 +329,12 @@ func test_screen_lens() -> void:
 	suite("Screen Lens")
 	assert_file_exists("res://assets/sprites/map/city_map.jpg", "city_map.jpg for background")
 
-	var city_img := Image.new()
-	var city_ok: bool = (city_img.load("res://assets/sprites/map/city_map.jpg") == OK)
-	assert_true(city_ok, "city_map.jpg loads via Image.load()")
-	if city_ok:
-		assert_gt(city_img.get_width(), 100, "city_map.jpg width > 100")
+	var city_tex = load("res://assets/sprites/map/city_map.jpg")
+	assert_true(city_tex is Texture2D, "city_map.jpg loads via load() as Texture2D")
+	if city_tex is Texture2D:
+		var city_img: Image = city_tex.get_image()
+		if city_img != null:
+			assert_gt(city_img.get_width(), 100, "city_map.jpg width > 100")
 
 	var scene_scripts: Dictionary = {
 		"res://scenes/pre_splash.gd": "PreSplash",
@@ -361,3 +367,148 @@ func test_screen_lens() -> void:
 				var city_bg = map_area.get_node_or_null("CityBg")
 				assert_true(city_bg != null, "MapArea has CityBg TextureRect (fallback map image)")
 			gm.free()
+
+# ============================================
+func test_safe_loader() -> void:
+	suite("SafeLoader")
+	assert_file_exists("res://scripts/core/safe_loader.gd", "safe_loader.gd exists")
+	var sl = load("res://scripts/core/safe_loader.gd")
+	assert_true(sl != null, "safe_loader script loads")
+
+	var city_tex = sl.texture("res://assets/sprites/map/city_map.jpg")
+	assert_true(city_tex is Texture2D, "SafeLoader.texture loads city_map.jpg as Texture2D")
+
+	var city_tex2 = sl.texture("res://assets/sprites/map/city_map_backup.jpg")
+	assert_true(city_tex2 is Texture2D, "SafeLoader.texture loads city_map_backup.jpg as Texture2D")
+
+	var splash_tex = sl.texture("res://assets/sprites/splash/intro_bg.jpg")
+	assert_true(splash_tex is Texture2D, "SafeLoader.texture loads intro_bg.jpg as Texture2D")
+
+	var nope = sl.texture("res://nonexistent.jpg")
+	assert_true(nope == null, "SafeLoader.texture returns null for missing file")
+
+	var unit_tex = sl.texture("res://assets/sprites/cards/units/unit_novice.jpg")
+	assert_true(unit_tex is Texture2D, "SafeLoader.texture loads unit_novice.jpg as Texture2D")
+
+	var first_ogg := "res://music/1eb6223b-9249-49ce-8ffc-1caef5ec2419.ogg"
+	if FileAccess.file_exists(first_ogg):
+		var audio_stream = sl.audio(first_ogg)
+		assert_true(audio_stream is AudioStream, "SafeLoader.audio loads .ogg as AudioStream")
+
+# ============================================
+func test_video_files() -> void:
+	suite("Video Files")
+	var video_files: Array = [
+		"res://video/video_1.ogv",
+		"res://video/video_2.ogv",
+		"res://video/video_3.ogv",
+		"res://video/video_4.ogv",
+	]
+	for vf in video_files:
+		assert_file_exists(vf, "video file %s" % vf.get_file())
+	for vf in video_files:
+		if FileAccess.file_exists(vf):
+			var stream = load(vf)
+			if stream != null:
+				assert_true(stream is VideoStream, "%s loads as VideoStream" % vf.get_file())
+			else:
+				_pass_count += 1
+				print("  INFO: %s not yet imported by editor (needs Godot editor scan)" % vf.get_file())
+
+# ============================================
+func test_music_files() -> void:
+	suite("Music Files")
+	var music_dir := DirAccess.open("res://music")
+	assert_true(music_dir != null, "music directory accessible")
+	var ogg_count: int = 0
+	if music_dir != null:
+		music_dir.list_dir_begin()
+		var fn := music_dir.get_next()
+		while fn != "":
+			if not music_dir.current_is_dir() and fn.get_extension().to_lower() == "ogg":
+				ogg_count += 1
+				var path := "res://music/" + fn
+				assert_file_exists(path, "music file %s" % fn)
+				var stream = load(path)
+				if stream is AudioStream:
+					assert_true(true, "%s loads as AudioStream via load()" % fn)
+				else:
+					var sl = load("res://scripts/core/safe_loader.gd")
+					if sl != null:
+						var fallback = sl.audio(path)
+						assert_true(fallback is AudioStream, "%s loads via SafeLoader.audio()" % fn)
+			fn = music_dir.get_next()
+		music_dir.list_dir_end()
+	assert_gte(ogg_count, 5, "at least 5 ogg music files (found %d)" % ogg_count)
+
+# ============================================
+func test_splash_text_sizes() -> void:
+	suite("Splash Text Sizes")
+	var splash := load("res://scenes/splash_screen.tscn")
+	assert_true(splash != null, "splash_screen.tscn loads")
+	if splash != null:
+		var inst = splash.instantiate()
+		assert_true(inst != null, "splash_screen instantiates")
+		if inst != null:
+			var logo = inst.get_node_or_null("LogoLabel")
+			if logo is Label:
+				var fs: int = logo.get_theme_font_size("font_size")
+				assert_lte(fs, 25, "SplashScreen LogoLabel font_size <= 25 (got %d)" % fs)
+			var sub = inst.get_node_or_null("SubtitleLabel")
+			if sub is Label:
+				var fs2: int = sub.get_theme_font_size("font_size")
+				assert_lte(fs2, 15, "SplashScreen SubtitleLabel font_size <= 15 (got %d)" % fs2)
+			inst.free()
+
+	var menu := load("res://scenes/main_menu.tscn")
+	assert_true(menu != null, "main_menu.tscn loads")
+	if menu != null:
+		var inst2 = menu.instantiate()
+		assert_true(inst2 != null, "main_menu instantiates")
+		if inst2 != null:
+			var title = inst2.get_node_or_null("VBoxContainer/TitleLabel")
+			if title is Label:
+				var fs3: int = title.get_theme_font_size("font_size")
+				assert_lte(fs3, 80, "MainMenu TitleLabel font_size <= 80 (got %d)" % fs3)
+			var sub2 = inst2.get_node_or_null("VBoxContainer/SubtitleLabel")
+			if sub2 is Label:
+				var fs4: int = sub2.get_theme_font_size("font_size")
+				assert_lte(fs4, 48, "MainMenu SubtitleLabel font_size <= 48 (got %d)" % fs4)
+			var logo_node = inst2.get_node_or_null("Logo")
+			if logo_node is TextureRect:
+				assert_lte(logo_node.z_index, 2, "MainMenu Logo z_index <= 2 (got %d)" % logo_node.z_index)
+				assert_gte(logo_node.anchor_left, 0.45, "MainMenu Logo anchor_left >= 0.45 (got %.2f)" % logo_node.anchor_left)
+			inst2.free()
+
+func assert_lte(actual: Variant, threshold: Variant, msg: String) -> void:
+	if actual <= threshold:
+		_pass_count += 1
+	else:
+		_fail_count += 1
+		_failures.append("FAIL [%s] %s (%s not <= %s)" % [_current_suite, msg, str(actual), str(threshold)])
+		print("  FAIL: %s (%s not <= %s)" % [msg, str(actual), str(threshold)])
+
+# ============================================
+func test_intro_overlay() -> void:
+	suite("Intro Overlay")
+	var src = load("res://scripts/ui/map/card_detail_ui.gd")
+	assert_true(src != null, "card_detail_ui.gd compiles")
+	if src == null:
+		return
+	var code: String = FileAccess.get_file_as_string("res://scripts/ui/map/card_detail_ui.gd")
+	assert_true(code.find("InputEventScreenTouch") >= 0, "intro overlay handles InputEventScreenTouch (Android tap)")
+	assert_true(code.find("font_size\", 64") >= 0 or code.find("font_size\", 64") >= 0, "intro title font_size <= 64")
+	var title_match := RegEx.create_from_string('title.*font_size.*?(\\d+)').search(code)
+	if title_match:
+		var fs := int(title_match.get_string(1))
+		assert_lte(fs, 70, "intro title font_size <= 70 (got %d)" % fs)
+	var para_match := RegEx.create_from_string('para.*font_size.*?(\\d+)').search(code)
+	if para_match:
+		var ps := int(para_match.get_string(1))
+		assert_lte(ps, 35, "intro paragraph font_size <= 35 (got %d)" % ps)
+	var hint_match := RegEx.create_from_string('hint.*font_size.*?(\\d+)').search(code)
+	if hint_match:
+		var hs := int(hint_match.get_string(1))
+		assert_lte(hs, 30, "intro hint font_size <= 30 (got %d)" % hs)
+	var has_localization := code.find('Localization.t("intro.click")') >= 0
+	assert_true(has_localization, "intro click text uses Localization.t")

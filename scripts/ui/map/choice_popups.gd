@@ -24,7 +24,7 @@ func show_religion_choice() -> void:
 	vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	overlay.add_child(vbox)
 	var title := Label.new()
-	title.text = "ВЫБЕРИТЕ ВЕРОВАНИЕ"
+	title.text = Localization.t("choice.religion_title")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 36)
 	title.add_theme_color_override("font_color", Color(1, 0.84, 0))
@@ -35,8 +35,8 @@ func show_religion_choice() -> void:
 	sp.custom_minimum_size = Vector2(0, 20)
 	vbox.add_child(sp)
 	var choices := [
-		{"id": "mnogobomzhie", "name": "Многобомжие", "desc": "Верования в древних бомжей-покровителей. Бог свалки, бог вокзала, бог картона, бог полторашки."},
-		{"id": "trezvost", "name": "Трезвость", "desc": "Путь воздержания. +производительность, -алкогольные карты."}
+		{"id": "mnogobomzhie", "name": Localization.t("religion.mnogobomzhie"), "desc": Localization.t("religion.mnogobomzhie.desc")},
+		{"id": "trezvost", "name": Localization.t("religion.trezvost"), "desc": Localization.t("religion.trezvost.desc")}
 	]
 	for choice in choices:
 		var btn := Button.new()
@@ -84,7 +84,7 @@ func show_ideology_choice() -> void:
 	vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	overlay.add_child(vbox)
 	var title := Label.new()
-	title.text = "ВЫБЕРИТЕ СТРОЙ"
+	title.text = Localization.t("choice.ideology_title")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 36)
 	title.add_theme_color_override("font_color", Color(1, 0.84, 0))
@@ -95,8 +95,8 @@ func show_ideology_choice() -> void:
 	sp.custom_minimum_size = Vector2(0, 20)
 	vbox.add_child(sp)
 	var choices := [
-		{"id": "alcoholism", "name": "Алкоголизм", "desc": "Тоталитарный строй. 0 налогов. Водка правит. +1 карта отряда при доборе."},
-		{"id": "dermocracy", "name": "Дерьмократия", "desc": "Свободный рынок мусора. +25% к мелочишке. Торговля краденым."}
+		{"id": "alcoholism", "name": Localization.t("ideology.alcoholism"), "desc": Localization.t("ideology.alcoholism.desc")},
+		{"id": "dermocracy", "name": Localization.t("ideology.dermocracy"), "desc": Localization.t("ideology.dermocracy.desc")}
 	]
 	for choice in choices:
 		var btn := Button.new()

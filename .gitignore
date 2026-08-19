@@ -19,3 +19,19 @@ ui_bot_log.txt
 *.md
 !README.md
 ui_bot_log.txt
+
+# Local-only (never push to GitHub)
+/AGENTS.md
+/TODO.md
+
+# build artifacts & heavy binaries (local only)
+dist/
+build_web/
+export/
+export_web/
+*.zip
+*.apk
+*.pck
+*.exe
+bot_logs/
+*.log

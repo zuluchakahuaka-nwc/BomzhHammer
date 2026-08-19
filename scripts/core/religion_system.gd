@@ -81,16 +81,16 @@ func get_riot_reduction() -> int:
 
 func get_religion_name() -> String:
 	match _religion:
-		"mnogobomzhie": return "Многобомжие"
-		"alcoteism": return "Алкотеизм"
-		"etanolstvo": return "Этанольство"
-		"trezvost": return "Трезвость"
+		"mnogobomzhie": return Localization.t("religion.mnogobomzhie")
+		"alcoteism": return Localization.t("religion.alcoteism")
+		"etanolstvo": return Localization.t("religion.etanolstvo")
+		"trezvost": return Localization.t("religion.trezvost")
 		_: return ""
 
 func get_religion_description() -> String:
 	match _religion:
-		"mnogobomzhie": return "Атака всех отрядов +1"
-		"alcoteism": return "Мелочишка +2 с каждой захваченной точки"
-		"etanolstvo": return "Алюминь +1, Бутылки +1, Картон +1 с каждой захваченной точки"
-		"trezvost": return "Строительство +2, бунты -2, алкогольные карты заблокированы"
+		"mnogobomzhie": return Localization.t("religion.mnogobomzhie.desc")
+		"alcoteism": return Localization.t("religion.alcoteism.desc")
+		"etanolstvo": return Localization.t("religion.etanolstvo.desc")
+		"trezvost": return Localization.t("religion.trezvost.desc")
 		_: return ""

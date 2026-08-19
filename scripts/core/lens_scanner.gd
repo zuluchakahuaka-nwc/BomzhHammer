@@ -59,6 +59,8 @@ func _reposition() -> void:
 	_map_lbl.position = Vector2(rx + 24, 29)
 
 func _process(delta: float) -> void:
+	if not is_inside_tree():
+		return
 	_pulse_t += delta
 	var pulse := 0.6 + 0.4 * sin(_pulse_t * 2.0)
 	_menu_sq.color = Color(_menu_color.r * pulse, _menu_color.g * pulse, _menu_color.b * pulse)
@@ -117,9 +119,9 @@ func _scan() -> void:
 
 func _check_main_menu(img: Image, w: int, h: int) -> void:
 	var points: Array = [
-		Vector2i(w * 2 / 5, h * 2 / 5),
-		Vector2i(w / 2, h / 2),
-		Vector2i(w * 3 / 5, h * 3 / 5),
+		Vector2i(w * 3 / 4, h / 4),
+		Vector2i(w * 4 / 5, h / 2),
+		Vector2i(w * 3 / 4, h * 3 / 4),
 	]
 	var bg_hits: int = 0
 	for p in points:
@@ -198,16 +200,14 @@ func _fix_city_map(gm: Control) -> void:
 		"res://assets/sprites/map/city_map_backup.jpg",
 	]
 	for p in paths:
-		var img := Image.new()
-		if img.load(p) == OK:
-			var tex := ImageTexture.create_from_image(img)
-			if tex != null:
-				gm.set("_city_map_tex", tex)
-				var city_bg: TextureRect = _get_city_bg(gm)
-				if city_bg != null:
-					city_bg.texture = tex
-				Logger.info("LENS", "FIXED: city_map reloaded from %s" % p)
-				return
+		var tex := SafeLoader.texture(p)
+		if tex != null:
+			gm.set("_city_map_tex", tex)
+			var city_bg: TextureRect = _get_city_bg(gm)
+			if city_bg != null:
+				city_bg.texture = tex
+			Logger.info("LENS", "FIXED: city_map reloaded from %s" % p)
+			return
 
 func _is_menu_bg(c: Color) -> bool:
 	return absf(c.r - MENU_BG.r) < 0.04 and absf(c.g - MENU_BG.g) < 0.04 and absf(c.b - MENU_BG.b) < 0.04
@@ -234,19 +234,17 @@ func _try_fix_menu() -> void:
 					"res://assets/sprites/splash/logos/logo_1.jpg",
 				]
 				for p in paths:
-					if FileAccess.file_exists(p):
-						var img := Image.new()
-						if img.load(p) == OK:
-							logo.texture = ImageTexture.create_from_image(img)
-							Logger.info("LENS", "FIXED: menu logo reloaded from %s" % p)
-							return
+					var tex := SafeLoader.texture(p)
+					if tex != null:
+						logo.texture = tex
+						Logger.info("LENS", "FIXED: menu logo reloaded from %s" % p)
+						return
 			var tv_bg: TextureRect = c.get_node_or_null("BomzhTV/TVBackground")
 			if tv_bg and tv_bg.texture == null:
-				if FileAccess.file_exists("res://assets/sprites/splash/bomzh_tv_bg.jpg"):
-					var img := Image.new()
-					if img.load("res://assets/sprites/splash/bomzh_tv_bg.jpg") == OK:
-						tv_bg.texture = ImageTexture.create_from_image(img)
-						Logger.info("LENS", "FIXED: TV bg reloaded")
+				var tex := SafeLoader.texture("res://assets/sprites/splash/bomzh_tv_bg.jpg")
+				if tex != null:
+					tv_bg.texture = tex
+					Logger.info("LENS", "FIXED: TV bg reloaded")
 			break
 
 func _try_fix_game_map() -> void:
@@ -261,11 +259,10 @@ func _try_fix_game_map() -> void:
 					"res://assets/sprites/map/city_map_backup.jpg",
 				]
 				for p in paths:
-					if FileAccess.file_exists(p):
-						var img := Image.new()
-						if img.load(p) == OK:
-							city_bg.texture = ImageTexture.create_from_image(img)
-							c._city_map_tex = city_bg.texture
-							Logger.info("LENS", "FIXED: city_map reloaded from %s" % p)
-							return
+					var tex := SafeLoader.texture(p)
+					if tex != null:
+						city_bg.texture = tex
+						c._city_map_tex = city_bg.texture
+						Logger.info("LENS", "FIXED: city_map reloaded from %s" % p)
+						return
 			break

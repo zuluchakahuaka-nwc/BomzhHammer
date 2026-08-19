@@ -62,5 +62,17 @@
   {"from": "dump_west", "to": "street_center", "type": "land", "movement_cost": 1.0},
   {"from": "dump_west", "to": "ulica_pohmelnaya_44", "type": "land", "movement_cost": 1.0},
   {"from": "dumpster_north", "to": "ploschad_pelmenistana", "type": "land", "movement_cost": 1.5},
-  {"from": "prospect_avtoritetov", "to": "prospect_peregarova", "type": "land", "movement_cost": 0.7}
+  {"from": "prospect_avtoritetov", "to": "prospect_peregarova", "type": "land", "movement_cost": 0.7},
+  {"from": "dumpster_north", "to": "pereulok_poproshaek", "type": "land", "movement_cost": 1.0},
+  {"from": "dacha_area", "to": "pereulok_poproshaek", "type": "land", "movement_cost": 1.0},
+  {"from": "dumpster_pharmacy", "to": "den_basman", "type": "land", "movement_cost": 1.5},
+  {"from": "dump_west", "to": "ulica_trezvyh", "type": "land", "movement_cost": 0.8},
+  {"from": "dump_south", "to": "ulica_pohmelnaya_44", "type": "land", "movement_cost": 0.8},
+  {"from": "dump_south", "to": "magazin_spirtmaster", "type": "land", "movement_cost": 0.8},
+  {"from": "dacha_area", "to": "den_basman", "type": "land", "movement_cost": 1.0},
+  {"from": "kutuzka", "to": "ploschad_pelmenistana", "type": "land", "movement_cost": 1.5},
+  {"from": "pereulok_skautov", "to": "ulica_pohmelnaya_44", "type": "land", "movement_cost": 0.8},
+  {"from": "prospect_avtoritetov", "to": "station_kazansky", "type": "land", "movement_cost": 0.7},
+  {"from": "pereulok_poproshaek", "to": "street_west", "type": "land", "movement_cost": 0.8},
+  {"from": "magazin_spirtmaster", "to": "street_center", "type": "land", "movement_cost": 0.7}
 ]

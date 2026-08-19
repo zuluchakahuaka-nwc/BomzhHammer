@@ -19,7 +19,7 @@ func _ready() -> void:
 	quote1.bbcode_enabled = true
 	quote1.fit_content = true
 	quote1.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	quote1.add_theme_font_size_override("normal_font_size", 22)
+	quote1.add_theme_font_size_override("normal_font_size", 44)
 	quote1.add_theme_color_override("default_color", Color(0.55, 0.55, 0.55, 1))
 	quote1.text = Localization.t("quote.institutions")
 	add_child(quote1)
@@ -33,7 +33,7 @@ func _ready() -> void:
 	quote2.bbcode_enabled = true
 	quote2.fit_content = true
 	quote2.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	quote2.add_theme_font_size_override("normal_font_size", 36)
+	quote2.add_theme_font_size_override("normal_font_size", 72)
 	quote2.add_theme_color_override("default_color", Color(1, 0.92, 0.15, 1))
 	quote2.text = Localization.t("quote.un_habitat")
 	add_child(quote2)
@@ -45,7 +45,7 @@ func _ready() -> void:
 	source.anchor_right = 0.94
 	source.anchor_bottom = 0.84
 	source.bbcode_enabled = true
-	source.add_theme_font_size_override("normal_font_size", 20)
+	source.add_theme_font_size_override("normal_font_size", 40)
 	source.add_theme_color_override("default_color", Color(0.4, 0.4, 0.4, 1))
 	source.text = "[color=gray]" + Localization.t("quote.source") + "[/color]"
 	add_child(source)

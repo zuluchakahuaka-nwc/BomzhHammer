@@ -35,12 +35,13 @@ var _STATE_NAMES: Array = [
 	"Непризнанное Государство Микропластик"
 ]
 
-var _RELIGION_CHOICES: Array = [
-	{"id": "mnogobomzhie", "name": "Многобомжие", "desc": "Атака всех отрядов +1"},
-	{"id": "alcoteism", "name": "Алкотеизм", "desc": "Мелочишка +2 с каждой захваченной точки"},
-	{"id": "etanolstvo", "name": "Этанольство", "desc": "Алюминь +1, Бутылки +1, Картон +1 с каждой точки"},
-	{"id": "trezvost", "name": "Трезвость", "desc": "Алкогольные карты заблокированы, строительство +2"}
-]
+func _get_religion_choices() -> Array:
+	return [
+		{"id": "mnogobomzhie", "name": Localization.t("religion.mnogobomzhie"), "desc": Localization.t("religion.mnogobomzhie.desc")},
+		{"id": "alcoteism", "name": Localization.t("religion.alcoteism"), "desc": Localization.t("religion.alcoteism.desc")},
+		{"id": "etanolstvo", "name": Localization.t("religion.etanolstvo"), "desc": Localization.t("religion.etanolstvo.desc")},
+		{"id": "trezvost", "name": Localization.t("religion.trezvost"), "desc": Localization.t("religion.trezvost.desc")}
+	]
 
 func _init() -> void:
 	_DeckScript = load("res://scripts/cards/deck.gd")
@@ -73,7 +74,7 @@ func new_game() -> void:
 	_current_turn = 1
 
 func get_religion_choices() -> Array:
-	return _RELIGION_CHOICES.duplicate(true)
+	return _get_religion_choices()
 
 func get_current_name_suggestion() -> String:
 	if _name_suggestion_index < _STATE_NAMES.size():

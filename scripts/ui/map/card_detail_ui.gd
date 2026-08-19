@@ -18,9 +18,9 @@ func show_intro() -> void:
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	var img := Image.new()
-	if img.load("res://assets/sprites/splash/intro_bg.jpg") == OK:
-		bg.texture = ImageTexture.create_from_image(img)
+	var tex := SafeLoader.texture("res://assets/sprites/splash/intro_bg.jpg")
+	if tex != null:
+		bg.texture = tex
 	overlay.add_child(bg)
 	var dim := ColorRect.new()
 	dim.color = Color(0, 0, 0, 0.55)
@@ -82,7 +82,12 @@ func show_intro() -> void:
 	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 	vbox.add_child(hint)
 	overlay.gui_input.connect(func(ev):
-		if ev is InputEventMouseButton and ev.pressed:
+		var is_press := false
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			is_press = true
+		elif ev is InputEventScreenTouch and ev.pressed:
+			is_press = true
+		if is_press:
 			overlay.queue_free()
 			GameManager.set_intro_shown()
 	)

@@ -3,13 +3,21 @@ extends Control
 var _card_data: Dictionary = {}
 var _cached_portrait: Texture2D = null
 var _portrait_path_checked: bool = false
+var _press_time: float = 0.0
+var _press_pos: Vector2 = Vector2.ZERO
+var _is_long_press: bool = false
+var _is_dragging: bool = false
+var _drag_threshold: float = 20.0
+var _long_press_time: float = 0.5
 
 signal card_clicked(data: Dictionary)
 signal card_right_clicked(data: Dictionary)
+signal card_long_pressed(data: Dictionary)
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(250, 375)
-	size = Vector2(250, 375)
+	if custom_minimum_size.x < 50:
+		custom_minimum_size = Vector2(250, 375)
+		size = Vector2(250, 375)
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	if Localization != null:
 		Localization.language_changed.connect(func(_l): queue_redraw())
@@ -68,14 +76,14 @@ func _draw() -> void:
 
 	var font := ThemeDB.fallback_font
 	var name_str2: String = Localization.get_card_name(_card_data)
-	var name_size: int = 24
+	var name_size: int = 30
 	var name_lines: Array = _wrap_text(name_str2, font, name_size, w - 12)
 	var name_y: float = h * 0.44 - float(name_lines.size() - 1) * (name_size + 2) * 0.5
 	var name_x: float = 6.0
 	for i in range(name_lines.size()):
 		draw_string_outline(font, Vector2(name_x, name_y + i * (name_size + 2)), name_lines[i], HORIZONTAL_ALIGNMENT_LEFT, w - 12, name_size, 6, Color(0, 0, 0))
 		draw_string(font, Vector2(name_x, name_y + i * (name_size + 2)), name_lines[i], HORIZONTAL_ALIGNMENT_LEFT, w - 12, name_size, Color(1, 1, 1))
-	var desc_size: int = 20
+	var desc_size: int = 24
 	var line_h: float = desc_size + 4
 	var name_block_bottom: float = name_y + float(name_lines.size()) * (name_size + 2)
 	var stat_y: float = name_block_bottom + 8.0
@@ -84,7 +92,7 @@ func _draw() -> void:
 		var atk: int = _card_data.get("attack", 0)
 		var def: int = _card_data.get("defense", 0)
 		var hp: int = _card_data.get("hp", 0)
-		var stat_size: int = 26
+		var stat_size: int = 32
 		var col_w: float = w / 3.0
 		draw_string_outline(font, Vector2(col_w * 0.0 + 10, stat_y + stat_size), str(atk), HORIZONTAL_ALIGNMENT_LEFT, -1, stat_size, 3, Color(0, 0, 0))
 		draw_string(font, Vector2(col_w * 0.0 + 10, stat_y + stat_size), str(atk), HORIZONTAL_ALIGNMENT_LEFT, -1, stat_size, Color(1, 1, 1))
@@ -92,7 +100,7 @@ func _draw() -> void:
 		draw_string(font, Vector2(col_w * 1.0 + 10, stat_y + stat_size), str(def), HORIZONTAL_ALIGNMENT_LEFT, -1, stat_size, Color(1, 1, 1))
 		draw_string_outline(font, Vector2(col_w * 2.0 + 10, stat_y + stat_size), str(hp), HORIZONTAL_ALIGNMENT_LEFT, -1, stat_size, 3, Color(0, 0, 0))
 		draw_string(font, Vector2(col_w * 2.0 + 10, stat_y + stat_size), str(hp), HORIZONTAL_ALIGNMENT_LEFT, -1, stat_size, Color(1, 1, 1))
-		var label_size: int = 13
+		var label_size: int = 16
 		draw_string_outline(font, Vector2(col_w * 0.0 + 6, stat_y + stat_size + label_size + 2), "ATK", HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, 2, Color(0, 0, 0))
 		draw_string(font, Vector2(col_w * 0.0 + 6, stat_y + stat_size + label_size + 2), "ATK", HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(1, 1, 1))
 		draw_string_outline(font, Vector2(col_w * 1.0 + 6, stat_y + stat_size + label_size + 2), "DEF", HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, 2, Color(0, 0, 0))
@@ -101,7 +109,7 @@ func _draw() -> void:
 		draw_string(font, Vector2(col_w * 2.0 + 6, stat_y + stat_size + label_size + 2), "HP", HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, Color(1, 1, 1))
 		var desc: String = Localization.get_card_description(_card_data)
 		if desc != "":
-			var unit_desc_size: int = 18
+			var unit_desc_size: int = 22
 			var unit_line_h: float = unit_desc_size + 3
 			var separator_y: float = stat_y + stat_size + label_size + 12
 			draw_line(Vector2(8, separator_y), Vector2(w - 8, separator_y), border_color, 2.0)
@@ -199,11 +207,7 @@ func _get_portrait_path() -> String:
 		"commander": sub = "commanders/"
 		"spell": sub = "spells/"
 		_: sub = "units/"
-	for ext in [".png", ".jpg"]:
-		var path: String = base + sub + card_id + ext
-		if FileAccess.file_exists(path):
-			return path
-	return ""
+	return base + sub + card_id + ".jpg"
 
 func _load_image(path: String) -> Texture2D:
 	if path == "":
@@ -217,6 +221,17 @@ func _gui_input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			card_right_clicked.emit(_card_data)
 			accept_event()
+	elif event is InputEventScreenTouch:
+		if event.pressed:
+			_press_time = Time.get_ticks_msec() / 1000.0
+			_press_pos = event.position
+		else:
+			var held := Time.get_ticks_msec() / 1000.0 - _press_time
+			var dist := event.position.distance_to(_press_pos)
+			if dist < _drag_threshold and held < _long_press_time:
+				card_clicked.emit(_card_data)
+				accept_event()
+			_press_time = 0
 
 func get_card_data() -> Dictionary:
 	return _card_data

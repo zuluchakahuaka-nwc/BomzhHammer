@@ -148,15 +148,21 @@ func _ready() -> void:
 	ResearchSystem.research_completed.connect(_on_research_completed)
 	ResearchSystem.periodic_triggered.connect(_on_periodic_triggered)
 	effects_toggle.pressed.connect(_toggle_effects)
+	effects_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	effects_panel.get_node("Title").mouse_filter = Control.MOUSE_FILTER_IGNORE
+	effects_grid.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	effects_toggle.mouse_filter = Control.MOUSE_FILTER_PASS
 	GameManager.phase_changed.connect(_on_phase_changed)
 	GameManager.turn_changed.connect(_on_turn_changed)
 	ResourceManager.resource_changed.connect(_on_resource_changed)
 	_update_all_ui()
+	MusicPlayer.play()
 	call_deferred("_build_map")
 	call_deferred("_setup_decks")
 	call_deferred("_generate_npc_garrisons")
 	call_deferred("_register_deployed")
 	call_deferred("_show_intro_if_needed")
+	call_deferred("_delayed_marker_refresh")
 
 func _show_intro_if_needed() -> void:
 	if not GameManager.was_intro_shown():
@@ -197,11 +203,14 @@ func _auto_deploy_initial_units() -> void:
 		_player_deployed["dump_west"].append(instance)
 		instance.territory_id = "dump_west"
 		_hand.remove_by_id(card_data.get("id", ""))
-	_territory_mgr.update_territory_marker("dump_west")
-	_territory_mgr.update_territory_button_style("dump_west", "player")
 	GameManager.set_territory_owner("dump_west", "player")
+	_territory_mgr.update_territory_button_style("dump_west", "player")
 	_lm("Initial units deployed to dump_west: %d" % to_deploy.size())
 	_refresh_hand_display()
+
+func _delayed_marker_refresh() -> void:
+	await get_tree().create_timer(0.5).timeout
+	_territory_mgr.refresh_all_markers()
 
 func _register_deployed() -> void:
 	GameManager.register_player_deployed(_player_deployed)
@@ -275,42 +284,59 @@ func _clear_children(node: Node) -> void:
 			child.free()
 
 func _refresh_hand_display() -> void:
-	_clear_children(unit_side)
-	_clear_children(sit_side)
-	var deployed_cards: Array = []
+	for container in [unit_side, sit_side]:
+		var inner: Control = container.get_node_or_null("Inner")
+		if inner:
+			_clear_children(inner)
+		else:
+			_clear_children(container)
+	var unit_cards: Array = []
+	print("[HandDisplay] _selected_territory=%s deployed_keys=%s" % [_selected_territory, str(_player_deployed.keys())])
 	if _selected_territory != "" and _player_deployed.has(_selected_territory):
 		var alive: Array = []
 		for u in _player_deployed[_selected_territory]:
 			if u.is_alive():
-				deployed_cards.append(u.to_dict())
+				unit_cards.append(u.to_dict())
 				alive.append(u)
 		_player_deployed[_selected_territory] = alive
-	var hand_unit_cards: Array = []
-	var sit_cards: Array = []
+		print("[HandDisplay] Deployed on %s: %d alive units" % [_selected_territory, alive.size()])
 	var all_cards: Array = _hand.get_all()
+	var sit_cards: Array = []
 	for card_data in all_cards:
 		if card_data.get("type", "") in ["unit", "commander"]:
-			hand_unit_cards.append(card_data)
+			unit_cards.append(card_data)
 		else:
 			sit_cards.append(card_data)
-	var all_unit_cards: Array = deployed_cards + hand_unit_cards
-	_place_hand_cards(unit_side, all_unit_cards)
+	print("[HandDisplay] total unit_cards=%d sit_cards=%d hand_total=%d" % [unit_cards.size(), sit_cards.size(), all_cards.size()])
+	_place_hand_cards(unit_side, unit_cards)
 	_place_hand_cards(sit_side, sit_cards)
-	if deployed_cards.size() > 0:
-		_lm("Territory %s: %d deployed + %d in hand" % [_selected_territory, deployed_cards.size(), hand_unit_cards.size()])
 
-func _place_hand_cards(container: Control, cards: Array) -> void:
-	if cards.is_empty():
+func _place_hand_cards(container: Control, cards: Array, extra_cards: Array = []) -> void:
+	var all_cards: Array = cards
+	if all_cards.is_empty():
 		return
 	var card_w: float = _card_w
 	var card_h: float = 270.0
+	var inner: Control = container.get_node_or_null("Inner")
+	if inner == null:
+		inner = Control.new()
+		inner.name = "Inner"
+		inner.set_anchors_preset(Control.PRESET_FULL_RECT)
+		inner.clip_contents = true
+		container.add_child(inner)
+	else:
+		for child in inner.get_children():
+			if not child.is_in_group("scroll_arrow"):
+				inner.remove_child(child)
+				child.free()
 	var container_w: float = container.size.x
 	if container_w < 10:
 		container_w = container.custom_minimum_size.x
 		if container_w < 10:
 			container_w = 400.0
+	print("[PlaceCards] container=%s cards=%d container_w=%.0f card_w=%.0f" % [container.name, all_cards.size(), container_w, card_w])
 	var spacing: float = _card_w + _card_gap
-	var total_w: float = card_w + maxf(cards.size() - 1, 0.0) * spacing
+	var total_w: float = card_w + maxf(all_cards.size() - 1, 0.0) * spacing
 	var is_unit: bool = (container == unit_side)
 	if is_unit:
 		_unit_total_w = total_w
@@ -324,21 +350,31 @@ func _place_hand_cards(container: Control, cards: Array) -> void:
 	else:
 		_sit_scroll_offset = minf(_sit_scroll_offset, max_offset)
 		scroll_off = _sit_scroll_offset
-	for i in range(cards.size()):
-		var card_data: Dictionary = cards[i]
+	for i in range(all_cards.size()):
+		var card_data: Dictionary = all_cards[i]
 		var widget := Control.new()
 		widget.set_script(load("res://scripts/ui/card_widget.gd"))
 		widget.name = "Card_" + str(i)
 		widget.custom_minimum_size = Vector2(card_w, card_h)
 		widget.size = Vector2(card_w, card_h)
-		widget.position = Vector2(i * spacing - scroll_off, 30.0)
+		inner.add_child(widget)
+		widget.size = Vector2(card_w, card_h)
+		widget.position = Vector2(i * spacing - scroll_off, 0.0)
 		widget.z_index = i
-		container.add_child(widget)
 		widget.setup(card_data)
-		widget.card_clicked.connect(_on_card_left_click)
+		widget.card_clicked.connect(_on_card_tap)
 		widget.card_right_clicked.connect(_on_card_right_click)
+	if not inner.has_node("DebugLabel"):
+		var dbg := Label.new()
+		dbg.name = "DebugLabel"
+		dbg.text = "CARDS:%d" % all_cards.size()
+		dbg.position = Vector2(0, 0)
+		dbg.add_theme_font_size_override("font_size", 20)
+		dbg.add_theme_color_override("font_color", Color(1, 0, 0))
+		dbg.z_index = 50
+		inner.add_child(dbg)
 	if total_w > container_w:
-		_add_scroll_arrows(container, is_unit, container_w)
+		_add_scroll_arrows(inner, is_unit, container_w)
 
 func _add_scroll_arrows(container: Control, is_unit: bool, container_w: float) -> void:
 	var arrow_size: float = 28.0
@@ -396,23 +432,21 @@ func _process(_delta: float) -> void:
 			_bot_tick()
 
 func _draw() -> void:
+	return
 	if _city_map_tex == null:
 		_city_map_tex = _reload_city_map()
 	if _city_map_tex == null:
-		if Engine.get_frames_drawn() % 300 == 0:
-			Logger.error("GameMap", "_draw: city_map_tex is NULL, cannot draw map")
 		return
 	var tex_size: Vector2 = _city_map_tex.get_size()
-	var area_pos: Vector2 = map_area.position
 	var area_size: Vector2 = map_area.size
 	if area_size.x < 1 or area_size.y < 1:
 		return
 	var scale_x: float = area_size.x / tex_size.x
 	var scale_y: float = area_size.y / tex_size.y
-	var s: float = maxf(scale_x, scale_y)
+	var s: float = minf(scale_x, scale_y)
 	var draw_size: Vector2 = tex_size * s
-	var offset: Vector2 = area_pos + (area_size - draw_size) * 0.5
-	draw_texture_rect(_city_map_tex, Rect2(offset, draw_size), false)
+	var offset: Vector2 = (area_size - draw_size) * 0.5
+	draw_texture_rect_region(_city_map_tex, Rect2(offset, draw_size), Rect2(Vector2.ZERO, tex_size), Color(1, 1, 1, 0.6))
 
 func _reload_city_map() -> Texture2D:
 	var paths: Array = [
@@ -420,25 +454,83 @@ func _reload_city_map() -> Texture2D:
 		"res://assets/sprites/map/city_map_backup.jpg",
 	]
 	for p in paths:
-		var img := Image.new()
-		if img.load(p) == OK:
-			var tex := ImageTexture.create_from_image(img)
-			if tex != null:
-				Logger.info("GameMap", "City map reloaded from %s" % p)
-				var city_bg: TextureRect = map_area.get_node_or_null("CityBg")
-				if city_bg:
-					city_bg.texture = tex
-				return tex
+		var tex := SafeLoader.texture(p)
+		if tex != null:
+			Logger.info("GameMap", "City map reloaded from %s" % p)
+			var city_bg: TextureRect = map_area.get_node_or_null("CityBg")
+			if city_bg:
+				city_bg.texture = tex
+			return tex
 	return null
 
-func _on_card_left_click(data: Dictionary) -> void:
+func _on_card_tap(data: Dictionary) -> void:
+	var existing = get_node_or_null("CardZoomOverlay")
+	if existing != null:
+		existing.queue_free()
+		return
+	_show_card_zoom(data)
+
+func _show_card_zoom(data: Dictionary) -> void:
+	var overlay := Control.new()
+	overlay.name = "CardZoomOverlay"
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 500
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(overlay)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.75)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(dim)
+	var card := Control.new()
+	card.set_script(load("res://scripts/ui/card_widget.gd"))
+	var zoom_w: float = 420.0
+	var zoom_h: float = 630.0
+	card.custom_minimum_size = Vector2(zoom_w, zoom_h)
+	card.size = Vector2(zoom_w, zoom_h)
+	var card_x := (size.x - zoom_w) * 0.5
+	var card_y := (size.y - zoom_h) * 0.35
+	card.position = Vector2(card_x, card_y)
+	card.z_index = 501
+	overlay.add_child(card)
+	card.setup(data)
+	var name_str: String = Localization.get_card_name(data)
+	var desc: String = Localization.get_card_description(data)
+	var card_type: String = data.get("type", "")
+	var info_parts: PackedStringArray = [name_str]
+	if card_type in ["unit", "commander"]:
+		info_parts.append("ATK: %s  DEF: %s  HP: %s" % [str(data.get("attack", 0)), str(data.get("defense", 0)), str(data.get("hp", 0))])
+	if desc != "":
+		info_parts.append(desc)
+	var info_label := Label.new()
+	info_label.text = "\n".join(info_parts)
+	info_label.position = Vector2(card_x, card_y + zoom_h + 15.0)
+	info_label.custom_minimum_size = Vector2(zoom_w, 0)
+	info_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	info_label.add_theme_font_size_override("font_size", 26)
+	info_label.add_theme_color_override("font_color", Color(1, 1, 1))
+	info_label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	info_label.add_theme_constant_override("outline_size", 3)
+	info_label.z_index = 501
+	overlay.add_child(info_label)
 	if data.get("type", "") in ["unit", "commander"]:
-		_enter_placing_mode(data)
-	else:
-		_play_non_unit_card(data)
+		var deploy_btn := Button.new()
+		deploy_btn.text = "РАЗМЕСТИТЬ"
+		deploy_btn.position = Vector2(card_x, card_y + zoom_h + 120.0)
+		deploy_btn.custom_minimum_size = Vector2(zoom_w, 60.0)
+		deploy_btn.add_theme_font_size_override("font_size", 28)
+		deploy_btn.z_index = 501
+		overlay.add_child(deploy_btn)
+		deploy_btn.pressed.connect(func():
+			overlay.queue_free()
+			_enter_placing_mode(data)
+		)
+	overlay.gui_input.connect(func(ev):
+		if (ev is InputEventScreenTouch and ev.pressed) or (ev is InputEventMouseButton and ev.pressed):
+			overlay.queue_free()
+	)
 
 func _on_card_right_click(data: Dictionary) -> void:
-	_show_card_detail(data)
+	_show_card_zoom(data)
 	card_play_btn.visible = false
 
 func _on_draw_popup_dismiss(event: InputEvent) -> void:
@@ -507,6 +599,20 @@ func _input(event: InputEvent) -> void:
 func _deploy_to_territory(target: String) -> void:
 	var data: Dictionary = _placing_data
 	_cancel_placing()
+	var target_owner: String = GameManager.get_territory_owner(target)
+	var can_deploy: bool = false
+	if target_owner == "player":
+		can_deploy = true
+	else:
+		for t_id in GameManager._territory_owners:
+			if GameManager._territory_owners[t_id] == "player":
+				var adj: Array = CardDatabase.get_adjacent_territories(t_id)
+				if adj.has(target):
+					can_deploy = true
+					break
+	if not can_deploy:
+		_lm("Cannot deploy: %s is not adjacent to your territory" % target)
+		return
 	var is_from_hand: bool = _hand.has_card(data.get("id", ""))
 	var cost: Dictionary = data.get("cost", {})
 	if is_from_hand:
@@ -584,6 +690,7 @@ func _apply_battle_result(result: Dictionary) -> void:
 	var attacker_won: bool = result.get("attacker_won", false)
 	var player_is_attacker: bool = result.get("player_is_attacker", true)
 	var player_won: bool = attacker_won if player_is_attacker else not attacker_won
+	var t_name_str: String = Localization.get_territory_name(CardDatabase.get_territory(t_id))
 
 	if player_won:
 		GameManager.set_territory_owner(t_id, "player")
@@ -595,23 +702,18 @@ func _apply_battle_result(result: Dictionary) -> void:
 		else:
 			_player_deployed[t_id] = alive
 		_territory_mgr.update_territory_button_style(t_id, "player")
-		var t_name_str: String = Localization.get_territory_name(CardDatabase.get_territory(t_id))
 		_result_popup.show_victory(t_name_str)
-		_lm("COMBAT WIN at %s!" % t_id)
+		_lm("COMBAT WIN at %s! All enemies destroyed" % t_id)
 		_check_victory()
 	else:
-		GameManager.set_territory_owner(t_id, "enemy")
 		_player_deployed.erase(t_id)
-		var alive: Array = _get_alive(_npc_garrisons.get(t_id, []))
-		if alive.is_empty():
-			_npc_garrisons.erase(t_id)
-		else:
-			_npc_garrisons[t_id] = alive
+		_npc_garrisons.erase(t_id)
 		_territory_mgr.update_npc_marker(t_id)
-		var t_name_str: String = Localization.get_territory_name(CardDatabase.get_territory(t_id))
+		GameManager.set_territory_owner(t_id, "enemy")
 		_result_popup.show_defeat(t_name_str)
-		_lm("COMBAT LOSS at %s!" % t_id)
+		_lm("COMBAT LOSS at %s! All your units destroyed" % t_id)
 	_territory_mgr.update_territory_marker(t_id)
+	_refresh_hand_display()
 	GameManager.register_player_deployed(_player_deployed)
 
 func _check_victory() -> void:
@@ -756,10 +858,20 @@ func _on_territory_clicked(t_id: String) -> void:
 	if _moving:
 		_territory_mgr.finish_move(t_id)
 		return
+	if _selected_territory != "" and _selected_territory != t_id:
+		var src_owner: String = GameManager.get_territory_owner(_selected_territory)
+		var tgt_owner: String = GameManager.get_territory_owner(t_id)
+		var adjacent: Array = CardDatabase.get_adjacent_territories(_selected_territory)
+		if src_owner == "player" and tgt_owner != "player" and adjacent.has(t_id):
+			_territory_mgr.attack_territory(t_id)
+			return
 	_select_territory(t_id)
 
 func _select_territory(t_id: String) -> void:
 	_territory_mgr.select_territory(t_id)
+	_selected_territory = t_id
+	_lm("Selected territory: %s deployed=%s" % [t_id, str(_player_deployed.get(t_id, []).size())])
+	_refresh_hand_display()
 
 func _show_territory_info(t_id: String) -> void:
 	_selected_territory = t_id
@@ -818,14 +930,14 @@ func _update_all_ui() -> void:
 	var pn: PackedStringArray = [Localization.t("phase.resources"),Localization.t("phase.draw"),Localization.t("phase.movement"),Localization.t("phase.combat"),Localization.t("phase.events"),Localization.t("phase.end")]
 	phase_label.text = pn[GameManager.get_current_phase()]
 	if GameManager.is_ideology_chosen():
-		ideology_label.text = "Строй: " + (Localization.t("ideology.alcoholism") if GameManager.get_ideology() == "alcoholism" else Localization.t("ideology.dermocracy"))
+		ideology_label.text = Localization.t("ideology.label") + (Localization.t("ideology.alcoholism") if GameManager.get_ideology() == "alcoholism" else Localization.t("ideology.dermocracy"))
 	else:
-		ideology_label.text = "Строй: —"
+		ideology_label.text = Localization.t("ideology.label") + "—"
 	if GameManager.is_religion_chosen():
 		var rname: String = GameManager.get_religion()
-		religion_label.text = "Верование: " + ("Многобомжие" if rname == "mnogobomzhie" else "Трезвость")
+		religion_label.text = Localization.t("religion.label") + ReligionSystem.get_religion_name()
 	else:
-		religion_label.text = "Верование: —"
+		religion_label.text = Localization.t("religion.label") + "—"
 	_update_resources()
 
 func _update_resources() -> void:
@@ -857,6 +969,7 @@ func _on_end_phase() -> void:
 	var phase: int = GameManager.get_current_phase()
 	match phase:
 		0:
+			_territory_mgr.reset_turn_attacks()
 			_spawn_territory_units()
 			_update_resources()
 			Logger.info("GameMap", "Phase 0: Income applied, territory units spawned")

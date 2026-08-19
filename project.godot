@@ -8,6 +8,11 @@
 
 config_version=5
 
+[android]
+
+permissions/custom_permissions=PackedStringArray()
+package/unique_name="ru.bomzhhammer.game"
+
 [application]
 
 config/name="BOMZHAMMER"

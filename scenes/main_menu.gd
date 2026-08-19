@@ -34,6 +34,7 @@ func _ready() -> void:
 	_setup_bomzh_tv()
 	_refresh_all_text()
 	Localization.language_changed.connect(func(_l): _refresh_all_text())
+	MusicPlayer.play()
 
 func _refresh_all_text() -> void:
 	title_label.text = Localization.t("game.title")
@@ -50,6 +51,12 @@ func _refresh_all_text() -> void:
 	var code := Localization.get_language()
 	if lang_btn:
 		lang_btn.text = Localization.t("btn.language") + " " + lang_names.get(code, code)
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_N or event.keycode == KEY_ENTER:
+			_on_new_game()
+			get_viewport().set_input_as_handled()
 
 func _on_new_game() -> void:
 	GameManager.start_game()
@@ -85,17 +92,17 @@ func _on_language() -> void:
 	Localization.set_language(next)
 
 func _load_fonts() -> void:
-	var logo_node = get_node_or_null("VBoxContainer/Logo")
+	var logo_node = get_node_or_null("Logo")
 	if logo_node:
 		logo_node.texture = SafeLoader.texture("res://assets/sprites/splash/logos/logo_5.jpg")
 	var tv_bg = get_node_or_null("BomzhTV/TVBackground")
 	if tv_bg:
 		tv_bg.texture = SafeLoader.texture("res://assets/sprites/splash/bomzh_tv_bg.jpg")
-	var title_font := SafeLoader.font("res://assets/fonts/BlackOpsOne.ttf")
+	var title_font := SafeLoader.font("res://assets/fonts/Philosopher-Bold.ttf")
 	if title_font:
 		title_label.add_theme_font_override("font", title_font)
 		subtitle_label.add_theme_font_override("font", title_font)
-	var btn_font := SafeLoader.font("res://assets/fonts/Cinzel-Bold.ttf")
+	var btn_font := SafeLoader.font("res://assets/fonts/Philosopher-Bold.ttf")
 	if btn_font:
 		new_game_btn.add_theme_font_override("font", btn_font)
 		continue_btn.add_theme_font_override("font", btn_font)
@@ -106,3 +113,6 @@ func _setup_bomzh_tv() -> void:
 	var tv_font := SafeLoader.font("res://assets/fonts/Philosopher-BoldItalic.ttf")
 	if tv_font:
 		tv_label.add_theme_font_override("font", tv_font)
+	if video_player != null:
+		video_player.visible = false
+		video_player.stream = null

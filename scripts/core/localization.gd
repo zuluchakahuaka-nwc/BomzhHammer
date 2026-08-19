@@ -4,27 +4,41 @@ signal language_changed(lang: String)
 
 const SAVE_PATH: String = "user://settings.json"
 
-var _current_lang: String = "en"
+var _current_lang: String = "ru"
 var _translations: Dictionary = {}
 var _available_languages: PackedStringArray = []
+var _tr_resources: Dictionary = {}
 
 func _ready() -> void:
 	_load_translations()
 	_load_saved_language()
 
 func _load_translations() -> void:
+	_load_translation_resources()
 	var path: String = "res://data/localization/translations.csv"
-	if not FileAccess.file_exists(path):
-		push_error("Localization: file not found: " + path)
-		return
+	if FileAccess.file_exists(path):
+		_load_from_csv(path)
+
+func _load_translation_resources() -> void:
+	for lang in ["ru", "en"]:
+		var tpath: String = "res://data/localization/translations." + lang + ".translation"
+		if ResourceLoader.exists(tpath):
+			var tr: Translation = load(tpath)
+			if tr:
+				_tr_resources[lang] = tr
+				if not _available_languages.has(lang):
+					_available_languages.append(lang)
+
+func _load_from_csv(path: String) -> void:
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
 	if file == null:
-		push_error("Localization: cannot open: " + path)
 		return
 	var header: PackedStringArray = file.get_csv_line()
+	if header.size() > 0:
+		header[0] = header[0].strip_edges().lstrip("\ufeff").lstrip("\ufffe")
 	var lang_idx: Dictionary = {}
 	for i in range(1, header.size()):
-		var lang: String = header[i].strip_edges()
+		var lang: String = header[i].strip_edges().lstrip("\ufeff").lstrip("\ufffe")
 		lang_idx[lang] = i
 		if not _available_languages.has(lang):
 			_available_languages.append(lang)
@@ -43,11 +57,7 @@ func _load_translations() -> void:
 
 func _load_saved_language() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
-		var sys_lang: String = TranslationServer.get_locale()
-		if sys_lang.begins_with("ru"):
-			_current_lang = "ru"
-		else:
-			_current_lang = "en"
+		_current_lang = "ru"
 		return
 	var file: FileAccess = FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if file == null:
@@ -84,15 +94,27 @@ func get_available_languages() -> PackedStringArray:
 func has_key(key: String) -> bool:
 	if _translations.has(_current_lang) and _translations[_current_lang].has(key):
 		return true
+	if _tr_resources.has(_current_lang) and _tr_resources[_current_lang].get_message(key) != "":
+		return true
 	if _translations.has("ru") and _translations["ru"].has(key):
+		return true
+	if _tr_resources.has("ru") and _tr_resources["ru"].get_message(key) != "":
 		return true
 	return false
 
 func t(key: String) -> String:
 	if _translations.has(_current_lang) and _translations[_current_lang].has(key):
 		return _translations[_current_lang][key]
+	if _tr_resources.has(_current_lang):
+		var val: String = _tr_resources[_current_lang].get_message(key)
+		if val != "" and val != key:
+			return val
 	if _translations.has("ru") and _translations["ru"].has(key):
 		return _translations["ru"][key]
+	if _tr_resources.has("ru"):
+		var val: String = _tr_resources["ru"].get_message(key)
+		if val != "" and val != key:
+			return val
 	return key
 
 func get_card_name(card_data: Dictionary) -> String:

@@ -1,4 +1,4 @@
-﻿key,ru,en
+key,ru,en
 game.title,BOMZHAMMER,BOMZHAMMER
 game.subtitle,ПЕРЕГАР СВОБОДЫ,HANGOVER OF FREEDOM
 phase.resources,Ресурсы,Resources
@@ -12,9 +12,14 @@ ideology.alcoholism.desc,Тоталитарный строй. 0 налогов. 
 ideology.dermocracy,Дерьмократия,Dermocracy
 ideology.dermocracy.desc,Высокие прибыли. Свободный рынок мусора.,High profits. Free garbage market.
 religion.mnogobomzhie,Многобомжие,Polyhomelessism
-religion.mnogobomzhie.desc,Верование в древних богов-бомжей.,Belief in ancient hobo gods.
+religion.mnogobomzhie.desc,"Верования в древних бомжей-покровителей. Бог свалки, бог вокзала, бог картона, бог полторашки.","Belief in ancient hobo gods. God of dumps, god of stations, god of cardboard, god of vodka bottles."
+religion.alcoteism,Алкотеизм,Alcoteism
+religion.alcoteism.desc,Мелочишка +2 с каждой захваченной точки.,+2 Coins from each captured territory.
+religion.etanolstvo,Этанольство,Ethanolism
+religion.etanolstvo.desc,"Алюминь +1, Бутылки +1, Картон +1 с каждой точки.", "+1 Aluminum, +1 Bottles, +1 Cardboard from each territory."
 religion.trezvost,Трезвость,Sobriety
-religion.trezvost.desc,Путь воздержания. Эффективная работа.,Path of abstinence. Efficient work.
+religion.trezvost.desc,"Путь воздержания. +производительность, -алкогольные карты.","Path of abstinence. +productivity, -alcohol cards."
+ideology.none,Нет строя,No ideology
 respect.legend,Легенда,Legend
 respect.authority,Авторитет,Authority
 respect.normal,Нормально,Normal
@@ -34,15 +39,17 @@ btn.quit,ВЫХОД,QUIT
 btn.bot_arena,БОТ АРЕНА,BOT ARENA
 btn.card_review,КАРТЫ,CARDS
 btn.end_phase,КОНЕЦ ФАЗЫ,END PHASE
-btn.back,НАЗАД,BACK
 btn.fight,ДРАТЬСЯ!,FIGHT!
 btn.close,ЗАКРЫТЬ,CLOSE
+btn.language,ЯЗЫК,LANGUAGE
+btn.back,НАЗАД,BACK
 event.oblava,Облава!,Raid!
 event.alco_coma,Алкогольная кома!,Alcohol coma!
 event.golod,Голод!,Famine!
 event.cirroz,Цирроз!,Cirrhosis!
 event.koreycy,Национальное блюдо!,National dish!
 splash.tap,НАЖМИТЕ ЧТОБЫ НАЧАТЬ,TAP TO START
+splash.skip,ПРОБЕЛ — пропустить,SPACE — skip
 turn.label,Ход %d,Turn %d
 owner.you,ВЫ,YOU
 owner.enemy,ВРАГ,ENEMY
@@ -62,7 +69,6 @@ terrain.type_label,Тип: ,Type:
 buyout.label,ВЫКУП: %d мелочишки (или захват),BUYOUT: %d coins (or capture)
 buyout.button,ВЫКУПИТЬ (%d мелочишки),BUYOUT (%d coins)
 territory.resources,Бутылки:%d Мелочишка:%d Водка:%d,Bottles:%d Coins:%d Vodka:%d
-ideology.none,Нет строя,No ideology
 happiness.obnoxious,ОБНАГЛЕЛИ — бунт неизбежен!,OBNOXIOUS — riot inevitable!
 happiness.complacent,Слишком довольны,Too complacent
 happiness.happy,Довольны,Happy
@@ -88,12 +94,30 @@ battle.log.vs,против,vs
 save.auto,Автосохранение,Auto-save
 save.loaded,Игра загружена (Ход %d),Game loaded (Turn %d)
 save.not_found,Сохранение не найдено,No save found
-btn.language,ЯЗЫК,LANGUAGE
 quote.institutions,"Институты отмечают большие пробелы в данных и разные определения бездомности, поэтому «сколько в мире бездомных» не может быть точно указано сейчас.","Research institutions note major data gaps and varying definitions of homelessness, so ""how many homeless people are there worldwide"" cannot be precisely stated at this time."
-quote.un_habitat,"UN-Habitat приводит оценку примерно 1,6 млрд человек, живущих в «неадекватном, переполненном и небезопасном жилье» (это шире классической «бездомности»).","UN-Habitat estimates approximately 1.6 billion people living in ""inadequate, overcrowded and unsafe housing"" (broader than classic ""homelessness"")."
+quote.un_habitat,"UN-Habitat: примерно 1,8 млрд человек живут в «неадекватном, переполненном и небезопасном жилье» (это шире классической «бездомности»).","UN-Habitat: approximately 1.8 billion people live in ""inadequate, overcrowded and unsafe housing"" (broader than classic ""homelessness"")."
 quote.source,ourworldindata.org / weforum.org,ourworldindata.org / weforum.org
-splash.skip,ПРОБЕЛ — пропустить,SPACE — skip
 intro.title,БОМЖХАММЕР,BOMZHAMMER
 intro.subtitle,Хроники Картонной Империи,Chronicles of the Cardboard Empire
 intro.text,"Кругом лишь руины. Старый мир рухнул. Свалки, опустевшие вокзалы и помойки стали новыми королевствами — и в каждом правит свой бездомный диктатор.\n\nВы — никто. Бездомный бродяга без имени, без прошлого, без будущего. Единственное что у вас есть — охапка картона, пустая бутылка и жажда власти. Ваша империя начнётся с нуля — с одной-единственной Свалки Западной.\n\nСвалка Западная — отправная точка, ваша крепость, ваш трон из мусора. Здесь вы соберёте первых последователей: алкашей, попрошаек, охотников за бутылками. Здесь вы построите первую ночлежку из картона, зальёте фундамент самогоном и поднимете флаг из грязной простыни на вершине мусорной горы.\n\nНо вы не одиноки. На соседних свалках уже хозяйничают конкуренты — бродячие таборы, банды отморозков, самогонные бароны. Вокзалы контролируются трестами попрошаек. Притоны превратились в вооружённые крепости. А элитные помойки возле «Элитвилля» — это территории, за которые идёт война не на жизнь, а на смерть.\n\nВам предстоит выбирать идеологию: станете ли вы Alcohol Dictatorship, держащим подданных на водочной игле, или Der'mokratiей, построенной на свободной торговле краденым? Примете ли вы веру Многобомжие с её идолами свалок и вокзалов, или изберёте путь Трезвости, отказавшись от алкоголя ради производительности?\n\nВпереди — облавы, набеги бродяг, нашествия крыс и тараканов, эпидемии цирроза и похмельные комы. Но впереди также — добыча, победы, изобретения и легендарные отряды, которые донесут ваш картонный стяг до самых далёких помоек.\n\nДобро пожаловать на Свалку Западную. Добро пожаловать в БомжХаммер.","Ruins everywhere. The old world has collapsed. Dumps, abandoned train stations and garbage bins became new kingdoms — each ruled by its own homeless dictator.\n\nYou are nobody. A homeless vagrant with no name, no past, no future. All you have is a bundle of cardboard, an empty bottle, and a thirst for power. Your empire will start from scratch — from a single Western Dump.\n\nThe Western Dump is your starting point, your fortress, your throne of garbage. Here you will gather your first followers: boozers, beggars, bottle hunters. Here you will build the first cardboard shelter, pour the foundation with moonshine, and raise a flag from a dirty bedsheet atop the garbage mountain.\n\nBut you are not alone. Rival gangs already rule neighboring dumps — roaming camps, gangs of thugs, moonshine barons. Train stations are controlled by begging trusts. Dens have become armed fortresses. And the elite dumpsters near ""Eliteville"" are territories where war is fought to the death.\n\nYou must choose your ideology: will you become an Alcohol Dictatorship, keeping subjects on a vodka needle, or a Der'mokratiya built on free trade of stolen goods? Will you embrace the faith of Polyhomelessism with its idols of dumps and stations, or choose the path of Sobriety, renouncing alcohol for productivity?\n\nAhead — raids, vagrant invasions, rat and cockroach plagues, cirrhosis epidemics and hangover comas. But also ahead — loot, victories, inventions and legendary squads that will carry your cardboard banner to the farthest dumpsters.\n\nWelcome to the Western Dump. Welcome to BomzhHammer."
 intro.click,"[ Нажмите чтобы начать ]","[ Click to begin ]"
+choice.religion_title,ВЫБЕРИТЕ ВЕРОВАНИЕ,CHOOSE YOUR FAITH
+choice.ideology_title,ВЫБЕРИТЕ СТРОЙ,CHOOSE YOUR IDEOLOGY
+religion.label,Верование: ,Faith: 
+ideology.label,Строй: ,Ideology: 
+building.nochlezhka,Ночлежка,Bunkhouse
+building.nochlezhka.desc,+10 население,+10 population
+building.krepost,Картонная крепость,Cardboard Fortress
+building.krepost.desc,+3 защита территории,+3 territory defense
+building.alcolesnica,Алколесница,Alco-chariot
+building.alcolesnica.desc,Боевая техника,Combat vehicle
+building.spirtank,Спиртанка,Spirittank
+building.spirtank.desc,Тяжёлая техника,Heavy vehicle
+building.telezhka,Тележка,Cart
+building.telezhka.desc,Транспорт/логистика,Transport/logistics
+building.paraplan,Картонный параплан,Cardboard Paraglider
+building.paraplan.desc,Разведка территорий,Territory reconnaissance
+building.samogon,Самогонный реактор,Moonshine Reactor
+building.samogon.desc,"+счастье, +водка/ход","+happiness, +vodka/turn"
+building.snarady,Снаряды-полторашки,Half-liter Shells
+building.snarady.desc,Боеприпасы,Ammunition

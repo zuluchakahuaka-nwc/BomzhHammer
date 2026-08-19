@@ -21,7 +21,9 @@ func _ready() -> void:
 	skip_label.visible = false
 	_load_fonts()
 	_scan_videos()
+	print("[SplashScreen] videos found: %d" % _videos.size())
 	if _videos.is_empty():
+		print("[SplashScreen] no videos, simulating loading only")
 		_simulate_loading_only()
 	else:
 		_play_next_video()
@@ -52,25 +54,42 @@ func _skip_to_menu() -> void:
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 func _load_fonts() -> void:
-	var font := SafeLoader.font("res://assets/fonts/BlackOpsOne.ttf")
+	var font := SafeLoader.font("res://assets/fonts/Philosopher-Bold.ttf")
 	if font:
 		logo_label.add_theme_font_override("font", font)
 		subtitle_label.add_theme_font_override("font", font)
 
 func _scan_videos() -> void:
 	_videos.clear()
-	var dir := DirAccess.open("res://video")
-	if dir == null:
-		return
-	dir.list_dir_begin()
-	var file_name := dir.get_next()
-	while file_name != "":
-		if not dir.current_is_dir():
-			var ext := file_name.get_extension().to_lower()
-			if ext in ["ogv", "ogg"]:
-				_videos.append("res://video/" + file_name)
-		file_name = dir.get_next()
-	dir.list_dir_end()
+	var all_ogv: Array = []
+	var dirs_to_scan: Array = ["res://video/new", "res://video"]
+	for base_dir in dirs_to_scan:
+		var d := DirAccess.open(base_dir)
+		if d == null:
+			continue
+		d.list_dir_begin()
+		var fn := d.get_next()
+		while fn != "":
+			if not d.current_is_dir():
+				var ext := fn.get_extension().to_lower()
+				if ext in ["ogv", "ogg"]:
+					var full_path: String = base_dir + "/" + fn
+					var mod_time: int = FileAccess.get_modified_time(full_path)
+					all_ogv.append({"path": full_path, "time": mod_time})
+			fn = d.get_next()
+		d.list_dir_end()
+	var seen: Dictionary = {}
+	for entry in all_ogv:
+		var base: String = entry["path"].get_file()
+		if seen.has(base):
+			continue
+		seen[base] = true
+		_videos.append(entry)
+	_videos.sort_custom(func(a, b): return a["time"] > b["time"])
+	var paths: Array = []
+	for entry in _videos:
+		paths.append(entry["path"])
+	_videos = paths
 
 func _play_next_video() -> void:
 	if _current_video >= _videos.size():
@@ -79,11 +98,15 @@ func _play_next_video() -> void:
 		_try_transition()
 		return
 	var path: String = _videos[_current_video]
+	print("[SplashScreen] loading video: %s" % path)
 	var stream := load(path)
 	if stream == null:
+		print("[SplashScreen] FAILED to load video: %s" % path)
 		_current_video += 1
 		_play_next_video()
 		return
+	print("[SplashScreen] video loaded OK, playing")
+	background.visible = false
 	video_player.stream = stream
 	video_player.play()
 	if not video_player.is_connected("finished", _on_video_finished):
@@ -121,4 +144,7 @@ func _try_transition() -> void:
 func _start_music() -> void:
 	var mp := get_node_or_null("/root/MusicPlayer")
 	if mp != null and mp.has_method("play"):
+		print("[SplashScreen] starting music, tracks: %d" % mp.get_track_count())
 		mp.play()
+	else:
+		print("[SplashScreen] MusicPlayer not found or no play method")
